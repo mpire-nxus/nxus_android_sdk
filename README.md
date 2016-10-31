@@ -8,7 +8,7 @@ allprojects {
 	repositories {
 		jcenter()
         maven {
-            url "http://54.88.226.33:8081/artifactory/libs-release-local"
+            url "http://maven.nxus.mobi/libs-release-local/"
         }
     }
 }
