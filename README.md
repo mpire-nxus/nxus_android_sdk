@@ -23,37 +23,38 @@ compile 'com.nxus.dsp:library:1.0.6@aar'
 ## AndroidManifest.xml modifications
 Add the following permissions to your applications AndroidManifest.xml file:
 ```
-&lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/&gt;
-&lt;uses-permission android:name="android.permission.INTERNET"/&gt;
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+<uses-permission android:name="android.permission.INTERNET"/>
 ```
 
 Also, inside the <b>application</b> tag, add following <b>meta-data</b> tag:
 ```
-&lt;meta-data 
-android:name="nxus.dsp.token"
-android:value="[YOUR_NXUS_DSP_TOKEN]"&gt;&lt;/meta-data&gt;
+<meta-data 
+	android:name="nxus.dsp.token"
+	android:value="[YOUR_NXUS_DSP_TOKEN]">
+</meta-data>
 ```
 
 To have Install Referrer resolved after application is downloaded, add the InstallReceiver within the <b>application</b> tag:
 ```
-&lt;receiver
+<receiver
 	android:name="com.nxus.dsp.receivers.InstallReceiver"
-	android:exported="true"&gt;
-	&lt;intent-filter&gt;
-		&lt;action android:name="com.android.vending.INSTALL_REFERRER" /&gt;
-	&lt;/intent-filter&gt;
-&lt;/receiver&gt;
+	android:exported="true">
+	<intent-filter>
+		<action android:name="com.android.vending.INSTALL_REFERRER" />
+	</intent-filter>
+</receiver>
 ```
 
 If you already have a BroadcastReceiver defined in your manifest file that is subscribed to the <b>com.android.vending.INSTALL_REFERRER</b> event, then instead of adding the <b>InstallReceiver</b>, add the following to your AndroidManifest.xml file:
 ```
-&lt;receiver 
+<receiver 
 	android:name="com.nxus.dsp.receivers.MultipleInstallReceiver"
-	android:exported="true"&gt;
-	&lt;intent-filter&gt;
-		&lt;action android:name="com.android.vending.INSTALL_REFERRER" /&gt;
-	&lt;/intent-filter&gt;
-&lt;/receiver&gt;
+	android:exported="true">
+	<intent-filter>
+		<action android:name="com.android.vending.INSTALL_REFERRER" />
+	</intent-filter>
+</receiver>
 ```
 
 Please note that this should be added as the first receiver for INSTALL_REFERRER, or else it won't be called.
