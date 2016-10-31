@@ -8,7 +8,7 @@ allprojects {
 	repositories {
 		jcenter()
         maven {
-            url "http://maven.nxus.mobi/libs-release-local/"
+            url "http://maven.nxus.mobi/libs-release-local"
         }
     }
 }
