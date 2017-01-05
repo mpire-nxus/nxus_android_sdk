@@ -63,7 +63,11 @@ Please note that this should be added as the first receiver for INSTALL_REFERRER
 After you completed the previous steps, you are ready to initialise the library and start sending events.
 You can initialise it within your Application class if you have one, if not, then do it in the <b>onCreate</b> method of your starting Activity:
 ```
-NxusDSPTracker.initializeLibrary(getApplicationContext());
+NxusDSPTracker.initializeLibrary(getApplication());
+```
+This will automatically also track activity transition events (activity started, activity paused, etc.). If you do not wish to track this, initialiase the library in the following way:
+```
+NxusDSPTracker.initializeLibrary(getApplication(), false);
 ```
 
 Once initialisation is done, an <b>app_start</b> event is automatically sent. If the application is started for the first time after installation, instead of <b>app_start</b>, <b>first_app_launch</b> is sent.
