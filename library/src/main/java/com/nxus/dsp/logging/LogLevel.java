@@ -2,7 +2,7 @@ package com.nxus.dsp.logging;
 
 /**
  * LogLevel
- * @author Zeljko Drascic
+ * @author
  *
  */
 public enum LogLevel {

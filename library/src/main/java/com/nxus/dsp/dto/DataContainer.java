@@ -14,7 +14,7 @@ import android.content.SharedPreferences.Editor;
 
 /**
  * Class for easier access to SharedPreferences and saving/pulling values to/from it.
- * @author Zeljko Drascic
+ * @author
  *
  */
 public class DataContainer {

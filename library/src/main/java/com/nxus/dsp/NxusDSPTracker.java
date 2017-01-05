@@ -1,5 +1,6 @@
 package com.nxus.dsp;
 
+import com.nxus.dsp.app.NxusActivityLifecycleCallbacks;
 import com.nxus.dsp.logging.LogLevel;
 import com.nxus.dsp.utils.Utils;
 import com.nxus.dsp.dto.IConstants;
@@ -7,12 +8,13 @@ import com.nxus.dsp.logging.Logger;
 import com.nxus.dsp.tracking.TrackingParams;
 import com.nxus.dsp.tracking.TrackingWorker;
 
+import android.app.Application;
 import android.content.Context;
 
 /**
  * 
  * NxusDSPTracker Library for TechMpire Advertising Network
- * @author Zeljko Drascic
+ * @author TechMpire Ltd.
  *
  */
 public class NxusDSPTracker {
@@ -23,13 +25,21 @@ public class NxusDSPTracker {
     
     /**
      * Initializing the library. Also, auto-sends the first_app_launch/app_start event.
-     * @param context
+     * @param application
      */
-    public static void initializeLibrary(Context context) {
+
+    public static void initializeLibrary(Application application) {
+        initializeLibrary(application, true);
+    }
+
+    public static void initializeLibrary(Application application, boolean trackActivities) {
         log.info("Starting DSP Tracking: " + IConstants.SDK_PLATFORM + ": " + BuildConfig.VERSION_NAME);
         
         if (instance == null) {
-            instance = new NxusDSPTracker(context);
+            instance = new NxusDSPTracker(application.getApplicationContext());
+            if (trackActivities) {
+                application.registerActivityLifecycleCallbacks(new NxusActivityLifecycleCallbacks());
+            }
         }
     }
 
