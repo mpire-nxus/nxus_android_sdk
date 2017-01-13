@@ -109,38 +109,13 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskDelegate {
 
                             int httpResult = urlConnection.getResponseCode();
                             if (httpResult == HttpURLConnection.HTTP_OK) {
+                                sendEventToS3(next, apiKey);
                                 deleteTrackingObject(next.getString(DataKeys.TRACK_EVENT_TIME_EPOCH));
                             } else {
                                 log.error("onFailure() Response was: " + httpResult);
                             }
                         } else {
-                            log.debug("Sending tracking event: " + next.get(DataKeys.TRACK_EVENT_NAME) + " : " + next.toString());
-
-                            //String requestString = buildDataUrl(next.toString());
-                            String requestString = buildFullDataUrl(next);
-                            log.debug("requestString: " + requestString);
-
-                            try {
-                                URL url = new URL(requestString);
-                                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-                                urlConnection.setRequestMethod("GET");
-                                urlConnection.setRequestProperty("User-Agent","AndroidSDK/1.0");
-                                urlConnection.setRequestProperty("Accept","*/*");
-                                urlConnection.setRequestProperty("Content-Type", "");
-                                urlConnection.setUseCaches(false);
-                                urlConnection.setRequestProperty(DataKeys.REQ_DSP_TOKEN, apiKey);
-
-                                int httpResult = urlConnection.getResponseCode();
-                                if (httpResult == HttpURLConnection.HTTP_OK) {
-                                    deleteTrackingObject(next.getString(DataKeys.TRACK_EVENT_TIME_EPOCH));
-                                } else {
-                                    log.error("onFailure() Response was: " + httpResult);
-                                }
-                            } catch (MalformedURLException e) {
-                                log.error(e.getMessage(), e);
-                            } catch (IOException e) {
-                                log.error(e.getMessage(), e);
-                            }
+                            sendEventToS3(next, apiKey);
                         }
                     }
                 }
@@ -161,6 +136,40 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskDelegate {
             }
         }
     }
+
+    private void sendEventToS3(JSONObject eventObject, String apiKey) {
+        try {
+            log.debug("Sending tracking event: " + eventObject.get(DataKeys.TRACK_EVENT_NAME) + " : " + eventObject.toString());
+
+            String requestString = buildFullDataUrl(eventObject);
+            log.debug("requestString: " + requestString);
+
+            try {
+                URL url = new URL(requestString);
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setRequestProperty("User-Agent","AndroidSDK/1.0");
+                urlConnection.setRequestProperty("Accept","*/*");
+                urlConnection.setRequestProperty("Content-Type", "");
+                urlConnection.setUseCaches(false);
+                urlConnection.setRequestProperty(DataKeys.REQ_DSP_TOKEN, apiKey);
+
+                int httpResult = urlConnection.getResponseCode();
+                if (httpResult == HttpURLConnection.HTTP_OK) {
+                    deleteTrackingObject(eventObject.getString(DataKeys.TRACK_EVENT_TIME_EPOCH));
+                } else {
+                    log.error("onFailure() Response was: " + httpResult);
+                }
+            } catch (MalformedURLException e) {
+                log.error(e.getMessage(), e);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        } catch (JSONException e) {
+            log.error("Tracking error happened", e);
+        }
+    }
+
     /**
      * Save build GET url formated for s3 service
      * replacement of problematic chars
