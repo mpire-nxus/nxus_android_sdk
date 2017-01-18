@@ -23,8 +23,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 8
-        versionName "1.0.8"
+        versionCode 9
+        versionName "1.0.9"
     }
     buildTypes {
         release {
@@ -41,7 +41,7 @@ dependencies {
 
 def libraryGroupId = 'com.nxus.dsp'
 def libraryArtifactId = 'library'
-def libraryVersion = '1.0.8'
+def libraryVersion = '1.0.9'
 
 publishing {
     publications {

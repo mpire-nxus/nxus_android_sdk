@@ -21,6 +21,7 @@ public class DataKeys {
 	public static final String NXUS_DSP_TOKEN				= "nxus.dsp.token";
 	
 	// Device information keys
+	public static final String DI_TRUST_DEVICE_ID			= "app_install_trust_key";
 	public static final String DI_APP_USER_UUID				= "app_user_uuid";
 	public static final String DI_DEVICE_FINGERPRINT_ID 	= "device_fingerprint_id";
 	public static final String DI_DEVICE_GOOGLE_ADVERT_ID 	= "device_google_advert_id";

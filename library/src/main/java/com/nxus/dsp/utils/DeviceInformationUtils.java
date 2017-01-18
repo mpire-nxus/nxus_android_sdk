@@ -22,6 +22,8 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
+import android.provider.Settings;
+import android.provider.Settings.Secure;
 import android.util.DisplayMetrics;
 
 /**
@@ -42,7 +44,9 @@ public class DeviceInformationUtils {
     String networkConnectionType; // network_connection_type
     String networkSimOperator; // network_sim_operator
     String networkSimCountry; // network_sim_country
-    
+
+    String trustDeviceAndroidId;
+
     String deviceType; // device_type
     String deviceOsName; // device_os
     String deviceOsVersion; // device_os_version
@@ -100,9 +104,9 @@ public class DeviceInformationUtils {
         int screenLayout = configuration.screenLayout;
         
         trackingDeviceInfo = new TreeMap<String, String>();
-        
-        // by default from 6.0+ we need to use getAndroidAdvertisingId....
-        // however up to 6.0 we can use hashed mac address or Secure.Android_ID
+
+        trustDeviceAndroidId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+        trustDeviceAndroidId = Utils.hash(trustDeviceAndroidId, IConstants.MD5);
         
         /*
         String macAddress = NetworkUtils.getDeviceMacAddress(context);        
@@ -585,6 +589,7 @@ public class DeviceInformationUtils {
 
         applicationUserUuid = getApplicationUserUuid();
 
+        trackingDeviceInfo.put(DataKeys.DI_TRUST_DEVICE_ID, trustDeviceAndroidId);
         trackingDeviceInfo.put(DataKeys.DI_APP_USER_UUID, applicationUserUuid);
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_FINGERPRINT_ID, deviceFingerPrint);
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_GOOGLE_ADVERT_ID, deviceGooglePlayStoreAdvertId);
