@@ -2,6 +2,7 @@ package com.nxus.dsp;
 
 import com.nxus.dsp.app.NxusActivityLifecycleCallbacks;
 import com.nxus.dsp.logging.LogLevel;
+import com.nxus.dsp.tracking.ITrackingConstants;
 import com.nxus.dsp.utils.Utils;
 import com.nxus.dsp.dto.IConstants;
 import com.nxus.dsp.logging.Logger;
@@ -36,6 +37,7 @@ public class NxusDSPTracker {
         log.info("Starting DSP Tracking: " + IConstants.SDK_PLATFORM + ": " + BuildConfig.VERSION_NAME);
         
         if (instance == null) {
+            TrackingWorker.storeValueBoolean(ITrackingConstants.CONF_LAUNCH_TRACKED_INTERNAL, false, application.getApplicationContext());
             instance = new NxusDSPTracker(application.getApplicationContext());
             if (trackActivities) {
                 application.registerActivityLifecycleCallbacks(new NxusActivityLifecycleCallbacks());

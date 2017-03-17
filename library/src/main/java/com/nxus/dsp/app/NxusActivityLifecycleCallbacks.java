@@ -9,8 +9,10 @@ import android.os.Bundle;
 
 import com.nxus.dsp.NxusDSPTracker;
 import com.nxus.dsp.logging.Logger;
+import com.nxus.dsp.tracking.ITrackingConstants;
 import com.nxus.dsp.tracking.TrackingEvents;
 import com.nxus.dsp.tracking.TrackingParams;
+import com.nxus.dsp.tracking.TrackingWorker;
 
 public class NxusActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
@@ -26,36 +28,44 @@ public class NxusActivityLifecycleCallbacks implements Application.ActivityLifec
     public void onActivityStarted(Activity activity) {
         log.debug("ACTIVITY STARTED: " + activity.getClass().getName());
 
-        TrackingParams params = new TrackingParams();
-        params.put(TRACKING_PARAMS_ACTIVITY, activity.getClass().getName());
-        NxusDSPTracker.trackEvent(TrackingEvents.ACTIVITY_STARTED, params);
+        if (TrackingWorker.getValueBoolean(ITrackingConstants.CONF_LAUNCH_TRACKED_INTERNAL, activity.getApplicationContext())) {
+            TrackingParams params = new TrackingParams();
+            params.put(TRACKING_PARAMS_ACTIVITY, activity.getClass().getName());
+            NxusDSPTracker.trackEvent(TrackingEvents.ACTIVITY_STARTED, params);
+        }
     }
 
     @Override
     public void onActivityResumed(Activity activity) {
         log.debug("ACTIVITY RESUMED: " + activity.getClass().getName());
 
-        TrackingParams params = new TrackingParams();
-        params.put(TRACKING_PARAMS_ACTIVITY, activity.getClass().getName());
-        NxusDSPTracker.trackEvent(TrackingEvents.ACTIVITY_RESUMED, params);
+        if (TrackingWorker.getValueBoolean(ITrackingConstants.CONF_LAUNCH_TRACKED_INTERNAL, activity.getApplicationContext())) {
+            TrackingParams params = new TrackingParams();
+            params.put(TRACKING_PARAMS_ACTIVITY, activity.getClass().getName());
+            NxusDSPTracker.trackEvent(TrackingEvents.ACTIVITY_RESUMED, params);
+        }
     }
 
     @Override
     public void onActivityPaused(Activity activity) {
         log.debug("ACTIVITY PAUSED: " + activity.getClass().getName());
 
-        TrackingParams params = new TrackingParams();
-        params.put(TRACKING_PARAMS_ACTIVITY, activity.getClass().getName());
-        NxusDSPTracker.trackEvent(TrackingEvents.ACTIVITY_PAUSED, params);
+        if (TrackingWorker.getValueBoolean(ITrackingConstants.CONF_LAUNCH_TRACKED_INTERNAL, activity.getApplicationContext())) {
+            TrackingParams params = new TrackingParams();
+            params.put(TRACKING_PARAMS_ACTIVITY, activity.getClass().getName());
+            NxusDSPTracker.trackEvent(TrackingEvents.ACTIVITY_PAUSED, params);
+        }
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
         log.debug("ACTIVITY STOPPED: " + activity.getClass().getName());
 
-        TrackingParams params = new TrackingParams();
-        params.put(TRACKING_PARAMS_ACTIVITY, activity.getClass().getName());
-        NxusDSPTracker.trackEvent(TrackingEvents.ACTIVITY_STOPPED, params);
+        if (TrackingWorker.getValueBoolean(ITrackingConstants.CONF_LAUNCH_TRACKED_INTERNAL, activity.getApplicationContext())) {
+            TrackingParams params = new TrackingParams();
+            params.put(TRACKING_PARAMS_ACTIVITY, activity.getClass().getName());
+            NxusDSPTracker.trackEvent(TrackingEvents.ACTIVITY_STOPPED, params);
+        }
     }
 
     @Override

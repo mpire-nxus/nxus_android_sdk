@@ -280,6 +280,7 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskDelegate {
      */
     public static void trackLaunchHandler(long lastLaunch) {
         storeValueLong(ITrackingConstants.CONF_LAST_LAUNCH_INTERNAL, System.currentTimeMillis(), context);
+        storeValueBoolean(ITrackingConstants.CONF_LAUNCH_TRACKED_INTERNAL, true, context);
 
         if (lastLaunch == 0) {
             Handler handler = new Handler();
@@ -318,7 +319,15 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskDelegate {
         return (prefs.getLong(storeName, 0));
     }
 
+    public static void storeValueBoolean(String storeName, boolean storeValue, Context ctx) {
+        SharedPreferences prefs = ctx.getSharedPreferences(TRACKING_PREFS_STORAGE, Context.MODE_PRIVATE);
+        prefs.edit().putBoolean(storeName, storeValue).apply();
+    }
 
+    public static boolean getValueBoolean(String storeName, Context ctx) {
+        SharedPreferences prefs = ctx.getSharedPreferences(TRACKING_PREFS_STORAGE, Context.MODE_PRIVATE);
+        return (prefs.getBoolean(storeName, false));
+    }
 
     /**
      * @param context
