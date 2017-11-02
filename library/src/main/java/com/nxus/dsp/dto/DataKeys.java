@@ -54,7 +54,7 @@ public class DataKeys {
 	public static final String DI_SDK_PLATFORM				= "sdk_platform";
 	
 	// Tracking keys
-	public static final String TRACK_APPLICATION_STATS		= "application_stats";
+//	public static final String TRACK_APPLICATION_STATS		= "application_stats";
 	public static final String TRACK_EVENT_NAME				= "event_name";
 	public static final String TRACK_EVENT_PARAM			= "event_param";
 	public static final String TRACK_EVENT_TIME				= "event_time";

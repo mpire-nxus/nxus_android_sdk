@@ -82,7 +82,7 @@ public class DeviceInformationUtils {
     String sdkPlatform;
     
     TreeMap<String, String> trackingDeviceInfo;
-    List<String> deviceInstalledApplications;
+//    List<String> deviceInstalledApplications;
     
     private boolean isGooglePlayServicesAvailable;
     
@@ -140,7 +140,7 @@ public class DeviceInformationUtils {
         applicationPackageVersionCode = getApplicationVersionCode(context); 
         applicationInstallTime = getApplicationInstallTime(context, applicationPackageName);
         applicationFirstRunTime = getApplicationFirstRunTime(context);
-        deviceInstalledApplications = getInstalledApplications(context);
+//        deviceInstalledApplications = getInstalledApplications(context);
         
         sdkVersion = BuildConfig.VERSION_NAME;
         sdkPlatform = IConstants.SDK_PLATFORM;
@@ -516,19 +516,19 @@ public class DeviceInformationUtils {
      * @param context
      * @return list of application package names
      */
-    private List<String> getInstalledApplications(Context context) {
-        final PackageManager pm = context.getPackageManager();
-        List<String> response = new ArrayList<String>();
-        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-
-        for (ApplicationInfo packageInfo : packages) {
-            if (!isSystemPackage(packageInfo)) {
-                response.add(packageInfo.packageName);
-            }
-        }
-        
-        return response;
-    }
+//    private List<String> getInstalledApplications(Context context) {
+//        final PackageManager pm = context.getPackageManager();
+//        List<String> response = new ArrayList<String>();
+//        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+//
+//        for (ApplicationInfo packageInfo : packages) {
+//            if (!isSystemPackage(packageInfo)) {
+//                response.add(packageInfo.packageName);
+//            }
+//        }
+//
+//        return response;
+//    }
     
     /**
      * Check if application is a system app. Used for filtering out system apps from list of all installed apps.
@@ -631,16 +631,16 @@ public class DeviceInformationUtils {
     /**
      * @return the deviceInstalledApplications
      */
-    public List<String> getDeviceInstalledApplications() {
-        return deviceInstalledApplications;
-    }
+//    public List<String> getDeviceInstalledApplications() {
+//        return deviceInstalledApplications;
+//    }
 
     /**
      * @param deviceInstalledApplications the deviceInstalledApplications to set
      */
-    public void setDeviceInstalledApplications(List<String> deviceInstalledApplications) {
-        this.deviceInstalledApplications = deviceInstalledApplications;
-    }
+//    public void setDeviceInstalledApplications(List<String> deviceInstalledApplications) {
+//        this.deviceInstalledApplications = deviceInstalledApplications;
+//    }
 
     /**
      * @return the trackingDeviceInfo

@@ -427,27 +427,27 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskDelegate {
             }
         }
 
-        if (event.equalsIgnoreCase(TrackingEvents.APP_LAUNCH) || event.equalsIgnoreCase(TrackingEvents.FIRST_APP_LAUNCH)) {
-            List<String> applicationData = deviceInformationUtils.getDeviceInstalledApplications();
-            if (applicationData.size() > 0) {
-                String apps = "";
-                String delimiter = "";
-
-                for (int i = 0; i < applicationData.size(); i++) {
-                    apps = apps + delimiter + applicationData.get(i);
-                    delimiter = ";";
-                }
-
-                applicationData = null;
-
-                try {
-                    trackingObject.put(DataKeys.TRACK_APPLICATION_STATS, apps);
-                } catch (JSONException e) {
-                    log.error(e.getMessage(), e);
-                }
-
-            }
-        }
+//        if (event.equalsIgnoreCase(TrackingEvents.APP_LAUNCH) || event.equalsIgnoreCase(TrackingEvents.FIRST_APP_LAUNCH)) {
+//            List<String> applicationData = deviceInformationUtils.getDeviceInstalledApplications();
+//            if (applicationData.size() > 0) {
+//                String apps = "";
+//                String delimiter = "";
+//
+//                for (int i = 0; i < applicationData.size(); i++) {
+//                    apps = apps + delimiter + applicationData.get(i);
+//                    delimiter = ";";
+//                }
+//
+//                applicationData = null;
+//
+//                try {
+//                    trackingObject.put(DataKeys.TRACK_APPLICATION_STATS, apps);
+//                } catch (JSONException e) {
+//                    log.error(e.getMessage(), e);
+//                }
+//
+//            }
+//        }
 
         try {
             trackingObject.put(DataKeys.TRACK_EVENT_NAME, event);
