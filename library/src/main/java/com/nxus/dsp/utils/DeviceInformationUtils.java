@@ -593,7 +593,8 @@ public class DeviceInformationUtils {
         trackingDeviceInfo.put(DataKeys.DI_APP_USER_UUID, applicationUserUuid);
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_FINGERPRINT_ID, deviceFingerPrint);
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_GOOGLE_ADVERT_ID, deviceGooglePlayStoreAdvertId);
-        
+        trackingDeviceInfo.put(DataKeys.DI_AAID, deviceGooglePlayStoreAdvertId);
+
         trackingDeviceInfo.put(DataKeys.DI_NETWORK_CONNECTION_TYPE, networkConnectionType);
         trackingDeviceInfo.put(DataKeys.DI_NETWORK_IP, networkIpAddress);
         

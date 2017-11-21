@@ -25,6 +25,7 @@ public class DataKeys {
 	public static final String DI_APP_USER_UUID				= "app_user_uuid";
 	public static final String DI_DEVICE_FINGERPRINT_ID 	= "device_fingerprint_id";
 	public static final String DI_DEVICE_GOOGLE_ADVERT_ID 	= "device_google_advert_id";
+	public static final String DI_AAID 						= "aaid";
 	public static final String DI_NETWORK_CONNECTION_TYPE	= "network_connection_type";
 	public static final String DI_NETWORK_IP				= "network_ip";
 	public static final String DI_NETWORK_SIM_OPERATOR		= "network_sim_operator";
