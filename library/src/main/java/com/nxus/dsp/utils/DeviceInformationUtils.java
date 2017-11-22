@@ -69,6 +69,10 @@ public class DeviceInformationUtils {
     String deviceFingerPrint = "";
     String deviceABI; // device_abi
 
+    String playReferrer;
+    long playClickTimestamp;
+    long playInstallBeginTimestamp;
+
     String applicationUserUuid; // unique id for tracking a combination of device + app install
     
     String applicationPackageName; // app_package_name
@@ -580,6 +584,10 @@ public class DeviceInformationUtils {
      * Prepairs device data for later use from TrackingWorker.
      */
     public void prepareInformations() {
+        playReferrer = DataContainer.getInstance().pullValueString(DataKeys.PLAY_INSTALL_REFERRER, this.context);
+        playClickTimestamp = DataContainer.getInstance().pullValueLong(DataKeys.PLAY_REF_CLICK_TIMESTAMP, this.context);
+        playInstallBeginTimestamp = DataContainer.getInstance().pullValueLong(DataKeys.PLAY_INSTALL_BEGIN_TIMESTAMP, this.context);
+
         deviceGooglePlayStoreAdvertId = DataContainer.getInstance().pullValueString(DataKeys.GOOGLE_ADVERTISER_ID, this.context);
         deviceFingerPrint = DataContainer.getInstance().pullValueString(DataKeys.FINGERPRINT, context);
         if (deviceFingerPrint.equalsIgnoreCase("")) {
@@ -594,6 +602,10 @@ public class DeviceInformationUtils {
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_FINGERPRINT_ID, deviceFingerPrint);
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_GOOGLE_ADVERT_ID, deviceGooglePlayStoreAdvertId);
         trackingDeviceInfo.put(DataKeys.DI_AAID, deviceGooglePlayStoreAdvertId);
+
+        trackingDeviceInfo.put(DataKeys.DI_PLAY_REFERRER, playReferrer);
+        trackingDeviceInfo.put(DataKeys.DI_PLAY_REF_CLICK_TIMESTAMP, Long.toString(playClickTimestamp));
+        trackingDeviceInfo.put(DataKeys.DI_PLAY_INSTALL_BEGIN_TIME, Long.toString(playInstallBeginTimestamp));
 
         trackingDeviceInfo.put(DataKeys.DI_NETWORK_CONNECTION_TYPE, networkConnectionType);
         trackingDeviceInfo.put(DataKeys.DI_NETWORK_IP, networkIpAddress);

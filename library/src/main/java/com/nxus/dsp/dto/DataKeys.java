@@ -9,7 +9,14 @@ public class DataKeys {
 	public static final String FINGERPRINT 					= "fingerprint";
 	
 	public static final String GOOGLE_ADVERTISER_ID 		= "gaid";
-	
+
+	public static final String GOOGLE_AAID_FETCHED			= "google_aaid_fetched";
+
+	public static final String PLAY_INSTALL_REFERRER		= "play-install-referrer";
+	public static final String PLAY_REF_CLICK_TIMESTAMP 	= "play-referrer-click-timestamp";
+	public static final String PLAY_INSTALL_BEGIN_TIMESTAMP	= "play-install-begin-timestamp";
+	public static final String PLAY_REFERRER_FETCHED		= "play-referrer-fetched";
+
 	public static final String DSP_API_KEY					= "dsp.api.key";
 	
 	// SharedPreferences files
@@ -26,6 +33,9 @@ public class DataKeys {
 	public static final String DI_DEVICE_FINGERPRINT_ID 	= "device_fingerprint_id";
 	public static final String DI_DEVICE_GOOGLE_ADVERT_ID 	= "device_google_advert_id";
 	public static final String DI_AAID 						= "aaid";
+	public static final String DI_PLAY_REFERRER				= "play_referrer";
+	public static final String DI_PLAY_REF_CLICK_TIMESTAMP	= "play_click_timestamp";
+	public static final String DI_PLAY_INSTALL_BEGIN_TIME	= "play_install_begin_timestamp";
 	public static final String DI_NETWORK_CONNECTION_TYPE	= "network_connection_type";
 	public static final String DI_NETWORK_IP				= "network_ip";
 	public static final String DI_NETWORK_SIM_OPERATOR		= "network_sim_operator";

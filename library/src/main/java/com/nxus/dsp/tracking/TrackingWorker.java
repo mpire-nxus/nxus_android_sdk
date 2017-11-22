@@ -9,13 +9,16 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.android.installreferrer.api.InstallReferrerClient;
+import com.android.installreferrer.api.InstallReferrerStateListener;
+import com.android.installreferrer.api.ReferrerDetails;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -32,6 +35,10 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
 
+import android.os.RemoteException;
+import static com.android.installreferrer.api.InstallReferrerClient.newBuilder;
+
+
 import javax.net.ssl.HttpsURLConnection;
 
 
@@ -40,7 +47,7 @@ import javax.net.ssl.HttpsURLConnection;
  * @author TechMpire ltd
  *
  */
-public class TrackingWorker implements Runnable, GoogleAdvertisingTaskDelegate {
+public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferrerDelegate {
     public static final Logger log = Logger.getLog(TrackingWorker.class);
 
     private static final String TRACKING_PREFS_STORAGE  = DataKeys.SHP_TRACKING_PREFS_STORAGE;
@@ -55,6 +62,8 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskDelegate {
 
     public static String trackingType = "post";
     public static String postEndpoint = "";
+
+    private static InstallReferrerClient mReferrerClient;
 
     private static Context context;
 
@@ -252,7 +261,7 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskDelegate {
      * Save launch tracking item and notify tracker thread to send it.
      * @param ctx
      */
-    public static void trackLaunch(Context ctx) {
+    public static void trackLaunch(final Context ctx) {
         log.debug("ref-extras: Tracking launcher.trackLaunch");
 
         if (singleton == null) {
@@ -265,6 +274,41 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskDelegate {
             boolean isGooglePlayServicesAvailable = (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS);
             if (isGooglePlayServicesAvailable) {
                 new GetAsyncGoogleAdvertiserId(singleton, context).execute(); // get Android Advertising ID
+
+                mReferrerClient = newBuilder(ctx).build();
+                mReferrerClient.startConnection(new InstallReferrerStateListener() {
+                    @Override
+                    public void onInstallReferrerSetupFinished(int responseCode) {
+                        switch (responseCode) {
+                            case InstallReferrerClient.InstallReferrerResponse.OK:
+                                try {
+                                    ReferrerDetails response = mReferrerClient.getInstallReferrer();
+                                    String installReferrer = response.getInstallReferrer();
+                                    long referrerClickTimestampSeconds = response.getReferrerClickTimestampSeconds();
+                                    long installBeginTimestampSeconds = response.getInstallBeginTimestampSeconds();
+
+                                    DataContainer.getInstance().storeValueString(DataKeys.PLAY_INSTALL_REFERRER, installReferrer, ctx);
+                                    DataContainer.getInstance().storeValueLong(DataKeys.PLAY_REF_CLICK_TIMESTAMP, referrerClickTimestampSeconds, ctx);
+                                    DataContainer.getInstance().storeValueLong(DataKeys.PLAY_INSTALL_BEGIN_TIMESTAMP, installBeginTimestampSeconds, ctx);
+                                } catch (RemoteException e) {
+                                    log.error(e.getMessage(), e);
+                                }
+                                break;
+                            case InstallReferrerClient.InstallReferrerResponse.FEATURE_NOT_SUPPORTED:
+                                break;
+                            case InstallReferrerClient.InstallReferrerResponse.SERVICE_UNAVAILABLE:
+                                break;
+                        }
+                        DataContainer.getInstance().storeValueBoolean(DataKeys.PLAY_REFERRER_FETCHED, true, ctx);
+                        singleton.onTaskCompletionResult();
+                    }
+
+                    @Override
+                    public void onInstallReferrerServiceDisconnected() {
+                        DataContainer.getInstance().storeValueBoolean(DataKeys.PLAY_REFERRER_FETCHED, true, ctx);
+                        singleton.onTaskCompletionResult();
+                    }
+                });
             } else {
                 trackLaunchHandler(lastLaunch);
             }
@@ -545,11 +589,13 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskDelegate {
     // this event is not supposed to be sent before google_advert_id is read
     // since it must be read in background task... gee thanks google for that 
     @Override
-    public void onTaskCompletionResult(String result) {
-        deviceInformationUtils.prepareInformations();
-        deviceInformationUtils.debugData();
-        long lastLaunch = pullValueLong(ITrackingConstants.CONF_LAST_LAUNCH_INTERNAL, context);
-        trackLaunchHandler(lastLaunch);
+    synchronized public void onTaskCompletionResult() {
+        if (DataContainer.getInstance().pullValueBoolean(DataKeys.PLAY_REFERRER_FETCHED, context) && DataContainer.getInstance().pullValueBoolean(DataKeys.GOOGLE_AAID_FETCHED, context)) {
+            deviceInformationUtils.prepareInformations();
+            deviceInformationUtils.debugData();
+            long lastLaunch = pullValueLong(ITrackingConstants.CONF_LAST_LAUNCH_INTERNAL, context);
+            trackLaunchHandler(lastLaunch);
+        }
     }
 
 }

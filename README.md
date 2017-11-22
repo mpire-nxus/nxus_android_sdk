@@ -10,6 +10,9 @@ allprojects {
         maven {
             url "http://maven.nxus.mobi/libs-release-local"
         }
+        maven {
+            url 'https://maven.google.com'
+        }
     }
 }
 ```
@@ -17,7 +20,9 @@ allprojects {
 Open your <b>app</b> module's <b>build.gradle</b> file and add the following dependencies:
 ```
 compile 'com.google.android.gms:play-services-base:9.2.0'
-compile 'com.nxus.dsp:library:1.0.15@aar'
+compile ('com.nxus.dsp:library:1.0.17@aar') {
+	transitive = true
+}
 ```
 
 ## AndroidManifest.xml modifications

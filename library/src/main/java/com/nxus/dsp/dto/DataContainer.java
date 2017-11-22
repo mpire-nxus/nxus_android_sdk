@@ -33,7 +33,15 @@ public class DataContainer {
         return instance;
     }
 
+    public void storeValueBoolean(String storeName, boolean storeValue, Context ctx) {
+        SharedPreferences prefs = ctx.getSharedPreferences(SHARED_PREFS_FILENAME, Context.MODE_PRIVATE);
+        prefs.edit().putBoolean(storeName, storeValue).apply();
+    }
 
+    public boolean pullValueBoolean(String storeName, Context ctx) {
+        SharedPreferences prefs = ctx.getSharedPreferences(SHARED_PREFS_FILENAME, Context.MODE_PRIVATE);
+        return prefs.getBoolean(storeName, false);
+    }
 
     /**
      * @param storeName: DataKeys.APP_FIRST_RUN > store value of applications first runtime

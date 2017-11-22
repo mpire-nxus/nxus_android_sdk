@@ -20,14 +20,14 @@ public class GetAsyncGoogleAdvertiserId extends AsyncTask<Void, Void, String> {
 	public static final Logger log = Logger.getLog(GetAsyncGoogleAdvertiserId.class);
 	
     final Context ctx;
-    private GoogleAdvertisingTaskDelegate delegate;
+    private GoogleAdvertisingTaskPlayReferrerDelegate delegate;
 
     /**
      * 
      * @param taskDelegate
      * @param context
      */
-    public GetAsyncGoogleAdvertiserId(GoogleAdvertisingTaskDelegate taskDelegate, Context context) {            
+    public GetAsyncGoogleAdvertiserId(GoogleAdvertisingTaskPlayReferrerDelegate taskDelegate, Context context) {
         super();
         ctx = context;
         delegate = taskDelegate;
@@ -56,13 +56,14 @@ public class GetAsyncGoogleAdvertiserId extends AsyncTask<Void, Void, String> {
     }
 
     /**
-     * Calling onTaskCompletionResult method on GoogleAdvertisingTaskDelegate (i.e. TrackingWorker) to continue with sending event after ID is resolved.
+     * Calling onTaskCompletionResult method on GoogleAdvertisingTaskPlayReferrerDelegate (i.e. TrackingWorker) to continue with sending event after ID is resolved.
      * @param advert
      */
     @Override
     protected void onPostExecute (String advert) {  
     	log.debug("onPostExecute: " + advert);
         DataContainer.getInstance().storeValueString(DataKeys.GOOGLE_ADVERTISER_ID, advert, ctx);
-        delegate.onTaskCompletionResult(advert);
+        DataContainer.getInstance().storeValueBoolean(DataKeys.GOOGLE_AAID_FETCHED, true, ctx);
+        delegate.onTaskCompletionResult();
     }
 }
