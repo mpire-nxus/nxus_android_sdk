@@ -74,4 +74,20 @@ public class StringUtils {
         
         return returnVal;
     }
+
+    public static String testAndConvertArabDate(String input) {
+        if (isProbablyArabic(input)) {
+            return (input.replace("١", "1").replace("٢", "2").replace("٣", "3").replace("٤", "4").replace("٥", "5").replace("٦", "6").replace("٧", "7").replace("٨", "8").replace("٩", "9").replace("٠", "0"));
+        }
+        return input;
+    }
+
+    private static boolean isProbablyArabic(String s) {
+        for (int i = 0; i < s.length();) {
+            int c = s.codePointAt(i);
+            if (c >= 0x0600 && c <= 0x06E0) return true;
+            i += Character.charCount(c);
+        }
+        return false;
+    }
 }

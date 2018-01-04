@@ -23,6 +23,7 @@ import com.android.installreferrer.api.ReferrerDetails;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.nxus.dsp.utils.DeviceInformationUtils;
+import com.nxus.dsp.utils.StringUtils;
 import com.nxus.dsp.utils.Utils;
 import com.nxus.dsp.dto.DataContainer;
 import com.nxus.dsp.dto.DataKeys;
@@ -521,8 +522,24 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
             log.error(e.getMessage(), e);
         }
 
+        trackingObject = trackingObjectCleanup(trackingObject);
+
         return trackingObject;
     }
+
+    private JSONObject trackingObjectCleanup(JSONObject jsonObject) {
+        try {
+            jsonObject.put(DataKeys.DI_APP_FIRST_LAUNCH, StringUtils.testAndConvertArabDate(jsonObject.getString(DataKeys.DI_APP_FIRST_LAUNCH)));
+            jsonObject.put(DataKeys.DI_APP_INSTALL_TIME, StringUtils.testAndConvertArabDate(jsonObject.getString(DataKeys.DI_APP_INSTALL_TIME)));
+            jsonObject.put(DataKeys.TRACK_EVENT_TIME, StringUtils.testAndConvertArabDate(jsonObject.getString(DataKeys.TRACK_EVENT_TIME)));
+        } catch (JSONException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return jsonObject;
+    }
+
+
 
     /**
      * Helper class for getting formatted TrackingItem as delimited string value.
