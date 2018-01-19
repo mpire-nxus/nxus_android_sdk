@@ -34,33 +34,36 @@ public class InstallReceiver extends BroadcastReceiver {
     public static final String UTM_CAMPAIGN_ID = "dsp_campaignid";
    
     @Override
-    public void onReceive(Context context, Intent intent) {        
+    public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
-        String referrerString = extras.getString(IConstants.INSTALL_REFERRER);
-        
-        if (!referrerString.equalsIgnoreCase("")) {
-            try {
-                Map<String, String> getParams = getHashMapFromQuery(referrerString);
-                SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFS_FILENAME, Context.MODE_PRIVATE);
-                SharedPreferences.Editor preferencesEditor = preferences.edit();
 
-                for (Map.Entry<String,String> entry : getParams.entrySet()) {
-                    String key = entry.getKey();
-                    String value = entry.getValue();
-                    if (value != null) {
-                        preferencesEditor.putString(key, value);
-                        log.debug("ref: " + key + " - " + value);
-                    }                   
-                }
-           
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
-                    preferencesEditor.commit();
-                } else {
-                    preferencesEditor.apply();
-                }
+        if (extras != null) {
+            String referrerString = extras.getString(IConstants.INSTALL_REFERRER);
 
-            } catch (UnsupportedEncodingException e) {  
-            	log.error("Referrer Error: " + e.getMessage(), e);
+            if ((referrerString != null) && !referrerString.equalsIgnoreCase("")) {
+                try {
+                    Map<String, String> getParams = getHashMapFromQuery(referrerString);
+                    SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFS_FILENAME, Context.MODE_PRIVATE);
+                    SharedPreferences.Editor preferencesEditor = preferences.edit();
+
+                    for (Map.Entry<String,String> entry : getParams.entrySet()) {
+                        String key = entry.getKey();
+                        String value = entry.getValue();
+                        if (value != null) {
+                            preferencesEditor.putString(key, value);
+                            log.debug("ref: " + key + " - " + value);
+                        }
+                    }
+
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
+                        preferencesEditor.commit();
+                    } else {
+                        preferencesEditor.apply();
+                    }
+
+                } catch (UnsupportedEncodingException e) {
+                    log.error("Referrer Error: " + e.getMessage(), e);
+                }
             }
         }
     }
