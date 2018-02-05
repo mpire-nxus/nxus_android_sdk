@@ -258,6 +258,18 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
         }
     }
 
+    public static void track(TrackingItem trackingItem) {
+        save(trackingItem, context);
+
+        if (singleton == null) {
+            return;
+        }
+
+        synchronized (singleton) {
+            singleton.notifyAll();
+        }
+    }
+
     /**
      * Save launch tracking item and notify tracker thread to send it.
      * @param ctx
@@ -436,7 +448,7 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
         TreeMap<String, ?> keys = new TreeMap<String, Object>(prefs.getAll());
         for (Map.Entry<String, ?> entry : keys.entrySet()) {
             String data[] = ((String)entry.getValue()).split(";");
-            currentTrackingObjects.add(buildTrackingItemObject(data[0], data[1], Long.parseLong(data[2])));
+            currentTrackingObjects.add(buildTrackingItemObject(data[0], data[1], data[2], Long.parseLong(data[3])));
         }
 
         return currentTrackingObjects;
@@ -449,7 +461,7 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
      * @param time
      * @return
      */
-    private JSONObject buildTrackingItemObject(String event, String params, long time){
+    private JSONObject buildTrackingItemObject(String eventIndex, String event, String params, long time){
         JSONObject trackingObject = null;
 
         if (deviceTrackingObjectDefault == null) {
@@ -495,6 +507,7 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
 //        }
 
         try {
+            trackingObject.put(DataKeys.TRACK_EVENT_INDEX, eventIndex);
             trackingObject.put(DataKeys.TRACK_EVENT_NAME, event);
             trackingObject.put(DataKeys.TRACK_EVENT_PARAM, params);
             trackingObject.put(DataKeys.TRACK_EVENT_TIME, Utils.convertMillisAndFormatDate(time) + "");
@@ -538,69 +551,6 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
 
         return jsonObject;
     }
-
-
-
-    /**
-     * Helper class for getting formatted TrackingItem as delimited string value.
-     */
-    static class TrackingItem {
-        private String event;
-        private TrackingParams params;
-        private long time;
-
-        /**
-         * @param event
-         * @param params
-         */
-        TrackingItem (String event, TrackingParams params) {
-            this.event = event;
-            this.params = params;
-            this.time = System.currentTimeMillis();
-        }
-
-        /**
-         * @param event
-         * @param params
-         * @param time
-         */
-        TrackingItem (String event, TrackingParams params, long time) {
-            this.event = event;
-            this.params = params;
-            this.time = time;
-        }
-
-        public String getEvent() {
-            return event;
-        }
-
-        public TrackingParams getParams() {
-            return params;
-        }
-
-        public long getTime() {
-            return time;
-        }
-
-        public String getTrack() {
-            String tempParams = "";
-            if (params != null) {
-                String concatenator = "";
-                StringBuilder builder = new StringBuilder();
-                for (Entry<String, String> entry : params.entrySet()) {
-                    builder.append(concatenator);
-                    builder.append(entry.getKey());
-                    builder.append("=");
-                    builder.append(entry.getValue());
-
-                    concatenator = "&";
-                }
-                tempParams = builder.toString();
-            }
-            return event + ";" + tempParams + ";" + time;
-        }
-    }
-
 
     // this is needed mostly for first_app_launch event
     // this event is not supposed to be sent before google_advert_id is read
