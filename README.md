@@ -93,16 +93,16 @@ NxusDSPTracker.trackEvent("event_name", params);
 ## Sending predefined events
 You can send predefined events using the SDK, with following methods:
 ```
-trackEventInstall(TrackingParams params);
-trackEventOpen(TrackingParams params);
-trackEventRegistration(TrackingParams params);
-trackEventPurchase(TrackingParams params);
-trackEventLevel(TrackingParams params);
-trackEventTutorial(TrackingParams params);
-trackEventAddToCart(TrackingParams params);
-trackEventCheckout(TrackingParams params);
-trackEventInvite(TrackingParams params);
-trackEventAchievement(TrackingParams params);
+NxusDSPTracker.trackEventInstall(TrackingParams params);
+NxusDSPTracker.trackEventOpen(TrackingParams params);
+NxusDSPTracker.trackEventRegistration(TrackingParams params);
+NxusDSPTracker.trackEventPurchase(TrackingParams params);
+NxusDSPTracker.trackEventLevel(TrackingParams params);
+NxusDSPTracker.trackEventTutorial(TrackingParams params);
+NxusDSPTracker.trackEventAddToCart(TrackingParams params);
+NxusDSPTracker.trackEventCheckout(TrackingParams params);
+NxusDSPTracker.trackEventInvite(TrackingParams params);
+NxusDSPTracker.trackEventAchievement(TrackingParams params);
 ```
 Every method takes a TrackingParams object, but is not mandatory.
 ```
