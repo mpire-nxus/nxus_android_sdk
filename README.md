@@ -90,6 +90,26 @@ params.put("key", "value");
 NxusDSPTracker.trackEvent("event_name", params);
 ```
 
+## Sending predefined events
+You can send predefined events using the SDK, with following methods:
+```
+trackEventInstall(TrackingParams params);
+trackEventOpen(TrackingParams params);
+trackEventRegistration(TrackingParams params);
+trackEventPurchase(TrackingParams params);
+trackEventLevel(TrackingParams params);
+trackEventTutorial(TrackingParams params);
+trackEventAddToCart(TrackingParams params);
+trackEventCheckout(TrackingParams params);
+trackEventInvite(TrackingParams params);
+trackEventAchievement(TrackingParams params);
+```
+Every method takes a TrackingParams object, but is not mandatory.
+```
+TrackingParams params = new TrackingParams();
+params.put("key", "value");
+```
+
 ## Logging
 To enable logging, call the method setLogLevel before library initialisation:
 ```
