@@ -1,10 +1,10 @@
-package com.nxus.dsp.tracking;
+package com.nxus.measurement.tracking;
 
 import java.util.Map;
 
 /**
- * Created by tomislavtusek on 05/02/2018.
  * Helper class for getting formatted TrackingItem as delimited string value.
+ * @author TechMpire Ltd.
  */
 
 public class TrackingItem {
@@ -20,10 +20,6 @@ public class TrackingItem {
         this.time = System.currentTimeMillis();
     }
 
-    /**
-     * @param event
-     * @param params
-     */
     public TrackingItem (String event, TrackingParams params) {
         this.eventIndex = "";
         this.event = event;
@@ -31,11 +27,6 @@ public class TrackingItem {
         this.time = System.currentTimeMillis();
     }
 
-    /**
-     * @param event
-     * @param params
-     * @param time
-     */
     public TrackingItem (String event, TrackingParams params, long time) {
         this.eventIndex = "";
         this.event = event;

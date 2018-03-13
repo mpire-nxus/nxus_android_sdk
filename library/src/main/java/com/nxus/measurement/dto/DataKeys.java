@@ -1,13 +1,14 @@
-package com.nxus.dsp.dto;
+package com.nxus.measurement.dto;
 
 /**
  * Different keys used across the SDK.
+ * @author TechMpire Ltd.
  */
 public class DataKeys {
-	
+
 	public static final String APP_FIRST_RUN 				= "app-first-run";
 	public static final String FINGERPRINT 					= "fingerprint";
-	
+
 	public static final String GOOGLE_ADVERTISER_ID 		= "gaid";
 
 	public static final String GOOGLE_AAID_FETCHED			= "google_aaid_fetched";
@@ -18,15 +19,15 @@ public class DataKeys {
 	public static final String PLAY_REFERRER_FETCHED		= "play-referrer-fetched";
 
 	public static final String DSP_API_KEY					= "dsp.api.key";
-	
+
 	// SharedPreferences files
 	public static final String SHP_DSP_STORAGE				= "dsp-storage";
 	public static final String SHP_TRACKING_PREFS_STORAGE	= "tracking_prefs_storage";
 	public static final String SHP_TRACKING_EVENTS_STORAGE	= "tracking_events_storage";
-	
+
 	// Manifest keys
-	public static final String NXUS_DSP_TOKEN				= "nxus.dsp.token";
-	
+	public static final String NXUS_DSP_TOKEN				= "nxus.measurement.token";
+
 	// Device information keys
 	public static final String DI_TRUST_DEVICE_ID			= "app_install_trust_key";
 	public static final String DI_APP_USER_UUID				= "app_user_uuid";
@@ -63,9 +64,8 @@ public class DataKeys {
 	public static final String DI_APP_FIRST_LAUNCH			= "app_first_launch";
 	public static final String DI_SDK_VERSION				= "sdk_version";
 	public static final String DI_SDK_PLATFORM				= "sdk_platform";
-	
+
 	// Tracking keys
-//	public static final String TRACK_APPLICATION_STATS		= "application_stats";
 	public static final String TRACK_EVENT_INDEX			= "event_index";
 	public static final String TRACK_EVENT_NAME				= "event_name";
 	public static final String TRACK_EVENT_PARAM			= "event_param";
@@ -75,7 +75,7 @@ public class DataKeys {
 	public static final String TRACK_ATD_AFFILIATE_ID		= "affiliate_id";
 	public static final String TRACK_ATD_CAMPAIGN_ID		= "campaign_id";
 	public static final String TRACK_ATTRIBUTION_DATA		= "attribution_data";
-	
+
 	// Request header keys
 	public static final String REQ_DSP_TOKEN				= "dsp-token";
 

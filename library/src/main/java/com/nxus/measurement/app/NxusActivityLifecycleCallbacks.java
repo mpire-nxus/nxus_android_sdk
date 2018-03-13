@@ -1,19 +1,19 @@
-package com.nxus.dsp.app;
+package com.nxus.measurement.app;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-import com.nxus.dsp.NxusDSPTracker;
-import com.nxus.dsp.logging.Logger;
-import com.nxus.dsp.tracking.ITrackingConstants;
-import com.nxus.dsp.tracking.TrackingEvents;
-import com.nxus.dsp.tracking.TrackingParams;
-import com.nxus.dsp.tracking.TrackingWorker;
+import com.nxus.measurement.MpireNxusMeasurement;
+import com.nxus.measurement.logging.Logger;
+import com.nxus.measurement.tracking.ITrackingConstants;
+import com.nxus.measurement.tracking.TrackingEvents;
+import com.nxus.measurement.tracking.TrackingParams;
+import com.nxus.measurement.tracking.TrackingWorker;
 
+/**
+ * @author TechMpire Ltd.
+ */
 public class NxusActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     private static final Logger log = Logger.getLog(NxusActivityLifecycleCallbacks.class);
@@ -31,7 +31,7 @@ public class NxusActivityLifecycleCallbacks implements Application.ActivityLifec
         if (TrackingWorker.getValueBoolean(ITrackingConstants.CONF_LAUNCH_TRACKED_INTERNAL, activity.getApplicationContext())) {
             TrackingParams params = new TrackingParams();
             params.put(TRACKING_PARAMS_ACTIVITY, activity.getClass().getName());
-            NxusDSPTracker.trackEvent(TrackingEvents.ACTIVITY_STARTED, params);
+            MpireNxusMeasurement.trackEvent(TrackingEvents.ACTIVITY_STARTED, params);
         }
     }
 
@@ -42,7 +42,7 @@ public class NxusActivityLifecycleCallbacks implements Application.ActivityLifec
         if (TrackingWorker.getValueBoolean(ITrackingConstants.CONF_LAUNCH_TRACKED_INTERNAL, activity.getApplicationContext())) {
             TrackingParams params = new TrackingParams();
             params.put(TRACKING_PARAMS_ACTIVITY, activity.getClass().getName());
-            NxusDSPTracker.trackEvent(TrackingEvents.ACTIVITY_RESUMED, params);
+            MpireNxusMeasurement.trackEvent(TrackingEvents.ACTIVITY_RESUMED, params);
         }
     }
 
@@ -53,7 +53,7 @@ public class NxusActivityLifecycleCallbacks implements Application.ActivityLifec
         if (TrackingWorker.getValueBoolean(ITrackingConstants.CONF_LAUNCH_TRACKED_INTERNAL, activity.getApplicationContext())) {
             TrackingParams params = new TrackingParams();
             params.put(TRACKING_PARAMS_ACTIVITY, activity.getClass().getName());
-            NxusDSPTracker.trackEvent(TrackingEvents.ACTIVITY_PAUSED, params);
+            MpireNxusMeasurement.trackEvent(TrackingEvents.ACTIVITY_PAUSED, params);
         }
     }
 
@@ -64,7 +64,7 @@ public class NxusActivityLifecycleCallbacks implements Application.ActivityLifec
         if (TrackingWorker.getValueBoolean(ITrackingConstants.CONF_LAUNCH_TRACKED_INTERNAL, activity.getApplicationContext())) {
             TrackingParams params = new TrackingParams();
             params.put(TRACKING_PARAMS_ACTIVITY, activity.getClass().getName());
-            NxusDSPTracker.trackEvent(TrackingEvents.ACTIVITY_STOPPED, params);
+            MpireNxusMeasurement.trackEvent(TrackingEvents.ACTIVITY_STOPPED, params);
         }
     }
 

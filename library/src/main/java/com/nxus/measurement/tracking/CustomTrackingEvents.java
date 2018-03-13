@@ -1,5 +1,8 @@
-package com.nxus.dsp.tracking;
+package com.nxus.measurement.tracking;
 
+/**
+ * @author TechMpire Ltd.
+ */
 public class CustomTrackingEvents {
 
 	public static final String INSTALL_INDEX 		= "1";
@@ -31,5 +34,5 @@ public class CustomTrackingEvents {
 
 	public static final String ACHIEVEMENT_INDEX 	= "10";
 	public static final String ACHIEVEMENT_NAME 	= "achievement";
-	
+
 }

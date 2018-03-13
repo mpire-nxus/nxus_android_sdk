@@ -1,20 +1,17 @@
-package com.nxus.dsp.utils;
+package com.nxus.measurement.utils;
 
 import java.math.BigInteger;
 import java.util.Locale;
 
-import com.nxus.dsp.dto.IConstants;
+import com.nxus.measurement.dto.IConstants;
 
 import android.text.TextUtils;
 
 /**
- * 
  * String utilities from DSP library
- * @author Zeljko Drascic
- *
+ * @author TechMpire Ltd.
  */
 public class StringUtils {
-    
 
     /**
      * Remove space character from string.. cleanup
@@ -25,16 +22,16 @@ public class StringUtils {
         if (dirtyString == null) {
             return null;
         }
-        
+
         String cleanString = dirtyString.replaceAll("\\s", "");
-        
+
         if (TextUtils.isEmpty(cleanString)) {
             return null;
         }
 
         return cleanString;
     }
-    
+
     /**
      * @param bytes
      * @return
@@ -50,14 +47,14 @@ public class StringUtils {
      * @return
      */
     private String getMacAddressShortMd5(String macAddress) {
-        
+
         if (macAddress == null) {
             return null;
         }
-        
+
         return Utils.hash(macAddress.replaceAll(":", ""), IConstants.MD5);
     }
-    
+
     /**
      * @param s
      * @param chunkSize
@@ -67,11 +64,11 @@ public class StringUtils {
         if (chunkSize == 0 ) chunkSize++; // o
         int chunkCount = (s.length() / chunkSize) + (s.length() % chunkSize == 0 ? 0 : 1);
         String[] returnVal = new String[chunkCount];
-        
+
         for(int i = 0; i < chunkCount; i++){
             returnVal[i] = s.substring(i*chunkSize, Math.min((i+1)*chunkSize, s.length()));
         }
-        
+
         return returnVal;
     }
 

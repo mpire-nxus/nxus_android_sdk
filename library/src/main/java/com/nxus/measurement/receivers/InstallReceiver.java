@@ -1,13 +1,13 @@
-package com.nxus.dsp.receivers;
+package com.nxus.measurement.receivers;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.nxus.dsp.dto.DataKeys;
-import com.nxus.dsp.dto.IConstants;
-import com.nxus.dsp.logging.Logger;
+import com.nxus.measurement.dto.DataKeys;
+import com.nxus.measurement.dto.IConstants;
+import com.nxus.measurement.logging.Logger;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,21 +18,18 @@ import android.os.Bundle;
 
 /**
  * Receiver for parsing referrer data after install from Google Play.
+ * @author TechMpire Ltd.
  */
 public class InstallReceiver extends BroadcastReceiver {
-	
+
     public static final Logger log = Logger.getLog(InstallReceiver.class);
-    
+
     public static final String SHARED_PREFS_FILENAME = DataKeys.SHP_DSP_STORAGE;
 
-    /**
-     *  Keep these three constants here just as a reminder
-     *  that they are available in referrer parameter after parsing. 
-     */
     public static final String UTM_CLICK_ID = "dsp_clickid";
     public static final String UTM_AFFILIATE_ID = "dsp_affiliateid";
     public static final String UTM_CAMPAIGN_ID = "dsp_campaignid";
-   
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
@@ -67,7 +64,7 @@ public class InstallReceiver extends BroadcastReceiver {
             }
         }
     }
-    
+
     /**
      * Parsing key-values from referrer string.
      * @param query
@@ -75,16 +72,16 @@ public class InstallReceiver extends BroadcastReceiver {
      * @throws UnsupportedEncodingException
      */
     public static Map<String, String> getHashMapFromQuery(String query) throws UnsupportedEncodingException {
-        Map<String, String> responsePairs = new LinkedHashMap<String, String>();  
+        Map<String, String> responsePairs = new LinkedHashMap<String, String>();
         String[] pairs = query.split("&");
         for (String pair : pairs) {
-        	log.debug("pair: " + pair);
-            if (!pair.equalsIgnoreCase("")) {               
+            log.debug("pair: " + pair);
+            if (!pair.equalsIgnoreCase("")) {
                 int idx = pair.indexOf("=");
                 responsePairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"),  URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
             }
         }
-        
+
         return responsePairs;
-    }    
+    }
 }

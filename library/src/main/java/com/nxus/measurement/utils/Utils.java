@@ -1,14 +1,14 @@
-package com.nxus.dsp.utils;
+package com.nxus.measurement.utils;
 
 import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import com.nxus.dsp.dto.DataContainer;
-import com.nxus.dsp.dto.DataKeys;
-import com.nxus.dsp.dto.IConstants;
-import com.nxus.dsp.logging.Logger;
+import com.nxus.measurement.dto.DataContainer;
+import com.nxus.measurement.dto.DataKeys;
+import com.nxus.measurement.dto.IConstants;
+import com.nxus.measurement.logging.Logger;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -17,20 +17,16 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.provider.Settings.Secure;
 
 /**
- * 
  * DSP Tracking Library Utility Class
- * All helper methods come here
- * 
- * @author Zeljko Drascic
- *
+ * @author TechMpire Ltd.
  */
 public class Utils {
-	
-	public static final Logger log = Logger.getLog(Utils.class);
+
+    public static final Logger log = Logger.getLog(Utils.class);
 
     private static final String DATE_FORMAT_TEMPLATE = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'Z";
     private static SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_TEMPLATE);
-  
+
     /**
      * Get supported CPU ABIs
      * @return
@@ -45,7 +41,7 @@ public class Utils {
             if (supportedAbisObject instanceof String[]) {
                 supportedAbis = (String[]) supportedAbisObject;
             }
-            
+
         } catch (Exception e) {}
 
         return supportedAbis;
@@ -65,10 +61,10 @@ public class Utils {
                 cpuAbi = (String) cpuAbiObject;
             }
         } catch (Exception e) {}
-        
+
         return cpuAbi;
     }
-    
+
     /**
      * @param context
      * @return
@@ -76,7 +72,7 @@ public class Utils {
     public static String getAndroidId(Context context) {
         return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
     }
-    
+
     /**
      * Hash a sent string value with selected method.
      * @param text
@@ -91,11 +87,10 @@ public class Utils {
             mesd.update(bytes, 0, bytes.length);
             final byte[] hash = mesd.digest();
             hashString = StringUtils.convertToHex(hash);
-            
         } catch (Exception e) {
-            // TODO: add some error reporting
+            log.error(e.getMessage(), e);
         }
-        
+
         return hashString;
     }
 
@@ -105,10 +100,11 @@ public class Utils {
             Class classObject = Class.forName(className);
             return classObject;
         } catch (Throwable t) {
+            log.error(t.getMessage(), t);
             return null;
         }
     }
-    
+
     /**
      * Check if permission is given to app.
      * @param context
@@ -118,9 +114,8 @@ public class Utils {
     public static boolean checkPermission(Context context, String permission) {
         int result = context.checkCallingOrSelfPermission(permission);
         return result == PackageManager.PERMISSION_GRANTED;
-        //TODO:: add permission alertbox?
     }
-    
+
     /**
      * @param timeInMillis
      * @return
@@ -137,18 +132,18 @@ public class Utils {
      * @return
      */
     public static String prepareFingerprint(String deviceGooglePlayStoreAdvertId) {
-    	String response = "";
-    	if ((deviceGooglePlayStoreAdvertId != null) && !deviceGooglePlayStoreAdvertId.equals("")) {
-    		String initFingerPrint = hash(deviceGooglePlayStoreAdvertId, IConstants.MD5);
+        String response = "";
+        if ((deviceGooglePlayStoreAdvertId != null) && !deviceGooglePlayStoreAdvertId.equals("")) {
+            String initFingerPrint = hash(deviceGooglePlayStoreAdvertId, IConstants.MD5);
             String chunks[] = StringUtils.splitByNumber(initFingerPrint, 4);
             String delimiter = "";
-            
+
             for (String st : chunks) {
                 response = response + delimiter + st;
                 delimiter = "-";
             }
-    	}
-        
+        }
+
         return response;
     }
 
@@ -157,15 +152,15 @@ public class Utils {
      * @param context
      */
     public static void updateApiKeyFromManifest(Context context) {
-        String dspToken = getValueFromManifest(context, DataKeys.NXUS_DSP_TOKEN); 
-        
+        String dspToken = getValueFromManifest(context, DataKeys.NXUS_DSP_TOKEN);
+
         if ((dspToken == null) || dspToken.equals("none")) {
-        	log.error(DataKeys.NXUS_DSP_TOKEN + " not found in AndroidManifest.xml");
+            log.error(DataKeys.NXUS_DSP_TOKEN + " not found in AndroidManifest.xml");
         } else {
-        	DataContainer.getInstance().storeValueString(DataKeys.DSP_API_KEY, dspToken, context);	
+            DataContainer.getInstance().storeValueString(DataKeys.DSP_API_KEY, dspToken, context);
         }
     }
-    
+
     /**
      * Reads DSP API key from AndroidManifest.xml.
      * @param applicationContext
@@ -178,7 +173,7 @@ public class Utils {
             ai = applicationContext.getPackageManager().getApplicationInfo(applicationContext.getPackageName(), PackageManager.GET_META_DATA);
             value = (String) ai.metaData.get(manifestValue);
         } catch (NameNotFoundException e) {
-        	log.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         return value;
     }

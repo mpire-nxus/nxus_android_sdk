@@ -1,4 +1,4 @@
-package com.nxus.dsp.tracking;
+package com.nxus.measurement.tracking;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -19,28 +19,26 @@ import org.json.JSONObject;
 import com.android.installreferrer.api.InstallReferrerClient;
 import com.android.installreferrer.api.InstallReferrerStateListener;
 import com.android.installreferrer.api.ReferrerDetails;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.nxus.dsp.utils.DeviceInformationUtils;
-import com.nxus.dsp.utils.StringUtils;
-import com.nxus.dsp.utils.Utils;
-import com.nxus.dsp.dto.DataContainer;
-import com.nxus.dsp.dto.DataKeys;
-import com.nxus.dsp.dto.IConstants;
-import com.nxus.dsp.logging.Logger;
-import com.nxus.dsp.receivers.InstallReceiver;
+import com.nxus.measurement.utils.DeviceInformationUtils;
+import com.nxus.measurement.utils.StringUtils;
+import com.nxus.measurement.utils.Utils;
+import com.nxus.measurement.dto.DataContainer;
+import com.nxus.measurement.dto.DataKeys;
+import com.nxus.measurement.dto.IConstants;
+import com.nxus.measurement.logging.Logger;
+import com.nxus.measurement.receivers.InstallReceiver;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
-
 import android.os.RemoteException;
-import static com.android.installreferrer.api.InstallReferrerClient.newBuilder;
-
 
 import javax.net.ssl.HttpsURLConnection;
+
+import static com.android.installreferrer.api.InstallReferrerClient.newBuilder;
 
 
 /**
@@ -180,30 +178,23 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
         }
     }
 
-    /**
-     * Save build GET url formated for s3 service
-     * replacement of problematic chars
-     * REMOVE THIS in future and replace event objet builder
-     * @param job
-     */
     private String buildFullDataUrl(JSONObject job) {
         String responseUrl = IConstants.SERVER_BASE_URL_EVENT;
         String delimiter = "?";
         Iterator<?> keys = job.keys();
 
         String prefixedPackageName = "android." + context.getPackageName();
-        responseUrl += Utils.hash(prefixedPackageName,"SHA-1"); // add app endpoint
+        responseUrl += Utils.hash(prefixedPackageName,"SHA-1");
 
         try {
             while( keys.hasNext() ) {
                 String key = (String) keys.next();
-                if (!key.equalsIgnoreCase(DataKeys.TRACK_EVENT_TIME_EPOCH) && !key.equalsIgnoreCase(DataKeys.TRACK_ATTRIBUTION_DATA)) { // remove debug timecode
+                if (!key.equalsIgnoreCase(DataKeys.TRACK_EVENT_TIME_EPOCH) && !key.equalsIgnoreCase(DataKeys.TRACK_ATTRIBUTION_DATA)) {
                     responseUrl += delimiter + key + "=" + URLEncoder.encode((String)job.get(key), "UTF-8");
                     delimiter = "&";
                 }
             }
 
-            // add attribution data
             JSONObject joba = (JSONObject) job.get(DataKeys.TRACK_ATTRIBUTION_DATA);
             if (joba != null) {
                 Iterator<?> akeys = joba.keys();
@@ -222,23 +213,6 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
 
         return responseUrl;
     }
-
-    /**
-     * Save build GET url formated for s3 service
-     * with base64encoded data + replacement of problematic charas
-     * @param jsonData
-     */
-    /*private String buildDataUrl(String jsonData) {
-
-        String responseUrl = IConstants.SERVER_BASE_URL_EVENT;
-        responseUrl += Utils.hash(context.getPackageName(),"SHA-1");
-        responseUrl += "?x=" + Base64.encodeToString(jsonData.getBytes(Charset.forName("UTF-8")), Base64.DEFAULT);
-        //responseUrl += "?x=test";
-
-        //System.out.println("responseUrl: " + responseUrl);
-
-        return responseUrl;
-    }*/
 
     /**
      * Save tracking item and notify tracker thread to send it.
@@ -286,7 +260,7 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
         if (lastLaunch == 0) {
             boolean isGooglePlayServicesAvailable = (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS);
             if (isGooglePlayServicesAvailable) {
-                new GetAsyncGoogleAdvertiserId(singleton, context).execute(); // get Android Advertising ID
+                new GetAsyncGoogleAdvertiserId(singleton, context).execute();
 
                 mReferrerClient = newBuilder(ctx).build();
                 mReferrerClient.startConnection(new InstallReferrerStateListener() {
@@ -331,7 +305,6 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
     }
 
     /**
-     *
      * Handle tracking event
      * @param lastLaunch
      */
@@ -356,21 +329,11 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
         }
     }
 
-    /**
-     * @param storeName: DataKeys.APP_FIRST_RUN > store value of applications first runtime
-     * @param storeValue
-     * @param ctx
-     */
     public static void storeValueLong(String storeName, long storeValue, Context ctx) {
         SharedPreferences prefs = ctx.getSharedPreferences(TRACKING_PREFS_STORAGE, Context.MODE_PRIVATE);
         prefs.edit().putLong(storeName, storeValue).apply();
     }
 
-    /**
-     * @param storeName: DataKeys.APP_FIRST_RUN > store value of applications first runtime
-     * @param ctx
-     * @return
-     */
     public static long pullValueLong(String storeName, Context ctx) {
         SharedPreferences prefs = ctx.getSharedPreferences(TRACKING_PREFS_STORAGE, Context.MODE_PRIVATE);
         return (prefs.getLong(storeName, 0));
@@ -386,9 +349,6 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
         return (prefs.getBoolean(storeName, false));
     }
 
-    /**
-     * @param context
-     */
     public static void trackServiceLaunch(Context context) {
         if (singleton == null) {
             singleton = new TrackingWorker(context);
@@ -401,7 +361,6 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
      * @param context
      * @return
      */
-    //context is passed to ensure item save
     private static synchronized boolean save(TrackingItem i, Context context) {
         SharedPreferences p = context.getSharedPreferences(TRACKING_EVENTS_STORAGE, Context.MODE_PRIVATE); // MODE_PRIVATE -> check for api level 11 > multi!
         SharedPreferences.Editor e = p.edit();
@@ -484,34 +443,12 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
             }
         }
 
-//        if (event.equalsIgnoreCase(TrackingEvents.APP_LAUNCH) || event.equalsIgnoreCase(TrackingEvents.FIRST_APP_LAUNCH)) {
-//            List<String> applicationData = deviceInformationUtils.getDeviceInstalledApplications();
-//            if (applicationData.size() > 0) {
-//                String apps = "";
-//                String delimiter = "";
-//
-//                for (int i = 0; i < applicationData.size(); i++) {
-//                    apps = apps + delimiter + applicationData.get(i);
-//                    delimiter = ";";
-//                }
-//
-//                applicationData = null;
-//
-//                try {
-//                    trackingObject.put(DataKeys.TRACK_APPLICATION_STATS, apps);
-//                } catch (JSONException e) {
-//                    log.error(e.getMessage(), e);
-//                }
-//
-//            }
-//        }
-
         try {
             trackingObject.put(DataKeys.TRACK_EVENT_INDEX, eventIndex);
             trackingObject.put(DataKeys.TRACK_EVENT_NAME, event);
             trackingObject.put(DataKeys.TRACK_EVENT_PARAM, params);
             trackingObject.put(DataKeys.TRACK_EVENT_TIME, Utils.convertMillisAndFormatDate(time) + "");
-            trackingObject.put(DataKeys.TRACK_EVENT_TIME_EPOCH, time); // debug!
+            trackingObject.put(DataKeys.TRACK_EVENT_TIME_EPOCH, time);
         } catch (JSONException e) {
             log.error(e.getMessage(), e);
         }
@@ -552,9 +489,9 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
         return jsonObject;
     }
 
-    // this is needed mostly for first_app_launch event
-    // this event is not supposed to be sent before google_advert_id is read
-    // since it must be read in background task... gee thanks google for that 
+    // This is needed mostly for first_app_launch event.
+    // This event is not supposed to be sent before google_advert_id is read
+    // since it must be read in background task.
     @Override
     synchronized public void onTaskCompletionResult() {
         if (DataContainer.getInstance().pullValueBoolean(DataKeys.PLAY_REFERRER_FETCHED, context) && DataContainer.getInstance().pullValueBoolean(DataKeys.GOOGLE_AAID_FETCHED, context)) {

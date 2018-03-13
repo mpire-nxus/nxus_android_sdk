@@ -1,7 +1,10 @@
-package com.nxus.dsp.tracking;
+package com.nxus.measurement.tracking;
 
+/**
+ * @author TechMpire Ltd.
+ */
 public interface ITrackingConstants {
-	
+
 	public static final String PREF = "dsp_tracking";
 	public static final long SLEEP = 30 * 60 * 1000;
 

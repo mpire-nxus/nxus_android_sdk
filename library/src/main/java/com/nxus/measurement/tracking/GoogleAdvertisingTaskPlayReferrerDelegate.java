@@ -1,10 +1,7 @@
-package com.nxus.dsp.tracking;
+package com.nxus.measurement.tracking;
 
 /**
- * 
- * 
- * @author Zeljko Drascic
- *
+ * @author TechMpire Ltd.
  */
 public interface GoogleAdvertisingTaskPlayReferrerDelegate {
     void onTaskCompletionResult();

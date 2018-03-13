@@ -1,18 +1,16 @@
-package com.nxus.dsp.utils;
+package com.nxus.measurement.utils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.nxus.dsp.BuildConfig;
-import com.nxus.dsp.dto.DataContainer;
-import com.nxus.dsp.dto.DataKeys;
-import com.nxus.dsp.dto.IConstants;
-import com.nxus.dsp.logging.Logger;
+import com.nxus.measurement.BuildConfig;
+import com.nxus.measurement.dto.DataContainer;
+import com.nxus.measurement.dto.DataKeys;
+import com.nxus.measurement.dto.IConstants;
+import com.nxus.measurement.logging.Logger;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -22,24 +20,21 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
-import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.util.DisplayMetrics;
 
 /**
- * 
  * TrackingDeviceInformation
  * Basic hardware/software info for users device
- * 
- * @author Zeljko Drascic
  *
+ * @author TechMpire Ltd.
  */
 public class DeviceInformationUtils {
     public static final Logger log = Logger.getLog(DeviceInformationUtils.class);
-    
+
     String networkMacSha1;
     String networkMacShortMd5; // device_fingerprint_id
-    
+
     String networkIpAddress;
     String networkConnectionType; // network_connection_type
     String networkSimOperator; // network_sim_operator
@@ -54,16 +49,16 @@ public class DeviceInformationUtils {
     String deviceModel; // device_model
     String deviceManufacturer; // device_manufacturer;
     String deviceHardwareName; // device_hardvare_name
-    
+
     String deviceScreenSize; // device_screen_size
     String deviceScreenFormat; // device_screen_format
     String deviceScreenDensity; // device_screen_dpi
     String deviceDisplayWidth; // device_screen_width
     String deviceDisplayHeight; // device_screen_height
-    
+
     String deviceLanguage; // device_lang
     String deviceCountry; // device_country
-    
+
     String deviceUserAgent; // device_user_agent
     String deviceGooglePlayStoreAdvertId = "";
     String deviceFingerPrint = "";
@@ -74,22 +69,21 @@ public class DeviceInformationUtils {
     long playInstallBeginTimestamp;
 
     String applicationUserUuid; // unique id for tracking a combination of device + app install
-    
+
     String applicationPackageName; // app_package_name
     String applicationPackageVersion; // app_package_version
     String applicationPackageVersionCode; // app_package_version_code
     String applicationInstallTime;
     String applicationFirstRunTime;
-    
+
     String sdkUserId;
     String sdkVersion;
     String sdkPlatform;
-    
+
     TreeMap<String, String> trackingDeviceInfo;
-//    List<String> deviceInstalledApplications;
-    
+
     private boolean isGooglePlayServicesAvailable;
-    
+
     Context context;
 
     /**
@@ -98,63 +92,58 @@ public class DeviceInformationUtils {
      */
     public DeviceInformationUtils(Context context) {
         this.context = context;
-        
+
         log.info("device information pickup");
-        
+
         Resources resources = context.getResources();
         DisplayMetrics displayMetrics = resources.getDisplayMetrics();
         Configuration configuration = resources.getConfiguration();
         Locale locale = configuration.locale;
         int screenLayout = configuration.screenLayout;
-        
+
         trackingDeviceInfo = new TreeMap<String, String>();
 
         trustDeviceAndroidId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
         trustDeviceAndroidId = Utils.hash(trustDeviceAndroidId, IConstants.MD5);
-        
-        /*
-        String macAddress = NetworkUtils.getDeviceMacAddress(context);        
-        networkMacSha1 = getMacSha1(macAddress);*/
-        
+
         isGooglePlayServicesAvailable = (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS);
         String macAddress = "";
-        
+
         if (!isGooglePlayServicesAvailable) {
             macAddress = NetworkUtils.getDeviceMacAddress(context);
-            networkMacShortMd5 = getMacShortMd5(macAddress);            
+            networkMacShortMd5 = getMacShortMd5(macAddress);
         }
-                
+
         networkConnectionType = NetworkUtils.getCurrentConnectionType(context);
         networkIpAddress = NetworkUtils.getDeviceIpAddress();
-        
+
         deviceOsName = getDeviceOsName();
         deviceOsVersion = getDeviceOsVersion();
         deviceApiLevel = getDeviceApiLevel();
         deviceType = getDeviceType(screenLayout);
         deviceModel = getDeviceModel();
-        deviceManufacturer = getDeviceManufacturer(); 
+        deviceManufacturer = getDeviceManufacturer();
         deviceHardwareName = getDeviceHardwareName();
         deviceUserAgent = getDeviceUserAgent(context);
-        
+
         deviceLanguage = getDeviceLanguage(locale);
         deviceCountry = getDeviceCountry(locale);
-        
+
         applicationPackageName = getApplicationPackageName(context);
         applicationPackageVersion = getApplicationVersion(context);
-        applicationPackageVersionCode = getApplicationVersionCode(context); 
+        applicationPackageVersionCode = getApplicationVersionCode(context);
         applicationInstallTime = getApplicationInstallTime(context, applicationPackageName);
         applicationFirstRunTime = getApplicationFirstRunTime(context);
-//        deviceInstalledApplications = getInstalledApplications(context);
-        
+
         sdkVersion = BuildConfig.VERSION_NAME;
         sdkPlatform = IConstants.SDK_PLATFORM;
-        
+
         deviceScreenSize = getScreenSize(screenLayout);
         deviceScreenFormat = getScreenFormat(screenLayout);
         deviceScreenDensity = getScreenDensity(displayMetrics);
         deviceDisplayWidth = getDisplayWidth(displayMetrics);
         deviceDisplayHeight = getDisplayHeight(displayMetrics);
-        
+
         deviceABI = getDeviceABICapabilities();
     }
 
@@ -197,7 +186,7 @@ public class DeviceInformationUtils {
     private String getDeviceApiLevel() {
         return Integer.toString(Build.VERSION.SDK_INT);
     }
-    
+
 
     /**
      * Resolve the application package name.
@@ -223,7 +212,7 @@ public class DeviceInformationUtils {
             return null;
         }
     }
-    
+
     /**
      * Returns application version code.
      * @param context
@@ -238,7 +227,7 @@ public class DeviceInformationUtils {
         } catch (NameNotFoundException e) {
             return null;
         }
-    }    
+    }
 
     /**
      * Based on SCREENLAYOUT_SIZE_* returns device type
@@ -334,7 +323,7 @@ public class DeviceInformationUtils {
      */
     private String getScreenDensity(DisplayMetrics displayMetrics) {
         int density = displayMetrics.densityDpi;
-        
+
         int low = (DisplayMetrics.DENSITY_MEDIUM + DisplayMetrics.DENSITY_LOW) / 2;
         int high = (DisplayMetrics.DENSITY_MEDIUM + DisplayMetrics.DENSITY_HIGH) / 2;
 
@@ -348,7 +337,7 @@ public class DeviceInformationUtils {
         return IConstants.DPI_MEDIUM;
     }
 
-    
+
     /**
      * Return Android Screen Resolution Width.
      * @param displayMetrics
@@ -374,11 +363,11 @@ public class DeviceInformationUtils {
      * @return hashed value of passed in macAddress
      */
     private String getMacSha1(String macAddress) {
-        
+
         if (macAddress == null) {
             return null;
         }
-        
+
         return Utils.hash(macAddress, IConstants.SHA1);
     }
 
@@ -388,15 +377,15 @@ public class DeviceInformationUtils {
      * @return hashed value of passed in macAddress
      */
     private String getMacShortMd5(String macAddress) {
-        
+
         if (macAddress == null) {
             return null;
         }
-        
-        return Utils.hash(macAddress.replaceAll(":", ""), IConstants.MD5);        
+
+        return Utils.hash(macAddress.replaceAll(":", ""), IConstants.MD5);
     }
 
-    
+
     /**
      * @param context
      * @param isGooglePlayServicesAvailable // replace this!
@@ -425,7 +414,7 @@ public class DeviceInformationUtils {
 
         return SupportedABIS[0];
     }
-    
+
     /**
      * Create a user agent from device data.
      * @param context
@@ -436,18 +425,18 @@ public class DeviceInformationUtils {
             StringBuffer buffer = new StringBuffer();
 
             final String version = Build.VERSION.RELEASE;
-            
+
             if (version.length() > 0) {
                 buffer.append(version);
             } else {
                 // default to "1.0"
                 buffer.append("1.0");
             }
-            
+
             buffer.append("; ");
             buffer.append("en");
             buffer.append(";");
-            
+
             // add the model for the release build
             if ("REL".equals(Build.VERSION.CODENAME)) {
                 final String model = Build.MODEL;
@@ -457,18 +446,18 @@ public class DeviceInformationUtils {
                 }
             }
             final String id = Build.ID;
-            
+
             if (id.length() > 0) {
                 buffer.append(" Build/");
                 buffer.append(id);
             }
-            
-            int webUserAgentTargetContentResourceId = Resources.getSystem().getIdentifier("web_user_agent_target_content", "string", "android");           
+
+            int webUserAgentTargetContentResourceId = Resources.getSystem().getIdentifier("web_user_agent_target_content", "string", "android");
             String mobile = "";
             if (webUserAgentTargetContentResourceId > 0) {
                 mobile = context.getResources().getText(webUserAgentTargetContentResourceId).toString();
             }
-            
+
             int webUserAgentResourceId = Resources.getSystem().getIdentifier("web_user_agent", "string", "android");
             final String base = context.getResources().getText(webUserAgentResourceId).toString();
             final String userAgent = String.format(base, buffer, mobile);
@@ -476,9 +465,9 @@ public class DeviceInformationUtils {
             return userAgent;
         }
         catch (Throwable t) {
-        	log.error("Exception caught while generating user agent: " + t.getMessage());
+            log.error("Exception caught while generating user agent: " + t.getMessage());
             return "Android";
-        }    
+        }
     }
 
     /**
@@ -488,11 +477,11 @@ public class DeviceInformationUtils {
      */
     private String getApplicationFirstRunTime(Context context) {
         long firstRun = DataContainer.getInstance().pullValueLong(DataKeys.APP_FIRST_RUN, context);
-        if (firstRun == 0) {            
+        if (firstRun == 0) {
             firstRun = System.currentTimeMillis();
             DataContainer.getInstance().storeValueLong(DataKeys.APP_FIRST_RUN, firstRun, context);
         }
-        
+
         return Utils.convertMillisAndFormatDate(firstRun);
     }
 
@@ -504,46 +493,16 @@ public class DeviceInformationUtils {
      */
     private String getApplicationInstallTime(Context context, String packageName) {
         long time = 0;
-        
+
         try {
             time = context.getPackageManager().getPackageInfo(packageName, 0).firstInstallTime;
         } catch (NameNotFoundException e) {
-        	log.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
         return Utils.convertMillisAndFormatDate(time);
     }
-    
 
-    /**
-     * List of installed application on device to be sent with first_app_launch/app_start events
-     * @param context
-     * @return list of application package names
-     */
-//    private List<String> getInstalledApplications(Context context) {
-//        final PackageManager pm = context.getPackageManager();
-//        List<String> response = new ArrayList<String>();
-//        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-//
-//        for (ApplicationInfo packageInfo : packages) {
-//            if (!isSystemPackage(packageInfo)) {
-//                response.add(packageInfo.packageName);
-//            }
-//        }
-//
-//        return response;
-//    }
-    
-    /**
-     * Check if application is a system app. Used for filtering out system apps from list of all installed apps.
-     * @param packageInfo
-     * @return true/false
-     */
-    private boolean isSystemPackage(ApplicationInfo packageInfo) {
-        return ((packageInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) ? true : false;
-    }
-
-    
     /**
      * @param context
      * @return
@@ -553,16 +512,16 @@ public class DeviceInformationUtils {
         log.trace("1: ", googlePlaystoreAdId);
         return googlePlaystoreAdId;
     }
-    
+
     /**
      * Debug device stored data
      * @return
      */
     public void debugData() {
-    	log.debug("... debug data ...");
+        log.debug("... debug data ...");
         for (Map.Entry<String, String> entry : trackingDeviceInfo.entrySet()) {
-        	log.debug(entry.getKey() + " : " + entry.getValue());
-        } 
+            log.debug(entry.getKey() + " : " + entry.getValue());
+        }
     }
 
     private String getApplicationUserUuid() {
@@ -579,9 +538,9 @@ public class DeviceInformationUtils {
 
         return response;
     }
-    
+
     /**
-     * Prepairs device data for later use from TrackingWorker.
+     * Prepares device data for later use from TrackingWorker.
      */
     public void prepareInformations() {
         playReferrer = DataContainer.getInstance().pullValueString(DataKeys.PLAY_INSTALL_REFERRER, this.context);
@@ -609,10 +568,10 @@ public class DeviceInformationUtils {
 
         trackingDeviceInfo.put(DataKeys.DI_NETWORK_CONNECTION_TYPE, networkConnectionType);
         trackingDeviceInfo.put(DataKeys.DI_NETWORK_IP, networkIpAddress);
-        
+
         trackingDeviceInfo.put(DataKeys.DI_NETWORK_SIM_OPERATOR, networkSimOperator);
         trackingDeviceInfo.put(DataKeys.DI_NETWORK_SIM_COUNTRY, networkSimCountry);
-        
+
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_TYPE, deviceType);
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_OS, deviceOsName);
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_OS_VERSION, deviceOsVersion);
@@ -626,49 +585,35 @@ public class DeviceInformationUtils {
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_SCREEN_DPI, deviceScreenDensity);
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_SCREEN_WIDTH, deviceDisplayWidth);
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_SCREEN_HEIGHT, deviceDisplayHeight);
-        trackingDeviceInfo.put(DataKeys.DI_DEVICE_LANG, deviceLanguage);        
+        trackingDeviceInfo.put(DataKeys.DI_DEVICE_LANG, deviceLanguage);
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_COUNTRY, deviceCountry);
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_USER_AGENT, deviceUserAgent);
         trackingDeviceInfo.put(DataKeys.DI_DEVICE_ABI, deviceABI);
-        
+
         trackingDeviceInfo.put(DataKeys.DI_APP_PACKAGE_NAME, applicationPackageName);
         trackingDeviceInfo.put(DataKeys.DI_APP_PACKAGE_VERSION, applicationPackageVersion);
         trackingDeviceInfo.put(DataKeys.DI_APP_PACKAGE_VERSION_CODE, applicationPackageVersionCode);
-        trackingDeviceInfo.put(DataKeys.DI_APP_INSTALL_TIME, applicationInstallTime);        
+        trackingDeviceInfo.put(DataKeys.DI_APP_INSTALL_TIME, applicationInstallTime);
         trackingDeviceInfo.put(DataKeys.DI_APP_FIRST_LAUNCH, applicationFirstRunTime);
-        
+
         trackingDeviceInfo.put(DataKeys.DI_SDK_VERSION, sdkVersion);
         trackingDeviceInfo.put(DataKeys.DI_SDK_PLATFORM, sdkPlatform);
     }
 
     /**
-     * @return the deviceInstalledApplications
-     */
-//    public List<String> getDeviceInstalledApplications() {
-//        return deviceInstalledApplications;
-//    }
-
-    /**
-     * @param deviceInstalledApplications the deviceInstalledApplications to set
-     */
-//    public void setDeviceInstalledApplications(List<String> deviceInstalledApplications) {
-//        this.deviceInstalledApplications = deviceInstalledApplications;
-//    }
-
-    /**
-     * @return the trackingDeviceInfo
+     * @return trackingDeviceInfo
      */
     public TreeMap<String, String> getTrackingDeviceInfo() {
         return trackingDeviceInfo;
     }
 
     /**
-     * @param trackingDeviceInfo the trackingDeviceInfo to set
+     * @param trackingDeviceInfo trackingDeviceInfo to set
      */
     public void setTrackingDeviceInfo(TreeMap<String, String> trackingDeviceInfo) {
         this.trackingDeviceInfo = trackingDeviceInfo;
     }
-        
-    
+
+
 }
 
