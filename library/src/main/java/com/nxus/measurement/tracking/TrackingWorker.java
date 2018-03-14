@@ -1,10 +1,34 @@
 package com.nxus.measurement.tracking;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.os.Handler;
+import android.os.RemoteException;
+
+import com.android.installreferrer.api.InstallReferrerClient;
+import com.android.installreferrer.api.InstallReferrerStateListener;
+import com.android.installreferrer.api.ReferrerDetails;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.nxus.measurement.dto.DataContainer;
+import com.nxus.measurement.dto.DataKeys;
+import com.nxus.measurement.dto.IConstants;
+import com.nxus.measurement.logging.Logger;
+import com.nxus.measurement.receivers.InstallReceiver;
+import com.nxus.measurement.utils.DeviceInformationUtils;
+import com.nxus.measurement.utils.StringUtils;
+import com.nxus.measurement.utils.Utils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -12,29 +36,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.android.installreferrer.api.InstallReferrerClient;
-import com.android.installreferrer.api.InstallReferrerStateListener;
-import com.android.installreferrer.api.ReferrerDetails;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.nxus.measurement.utils.DeviceInformationUtils;
-import com.nxus.measurement.utils.StringUtils;
-import com.nxus.measurement.utils.Utils;
-import com.nxus.measurement.dto.DataContainer;
-import com.nxus.measurement.dto.DataKeys;
-import com.nxus.measurement.dto.IConstants;
-import com.nxus.measurement.logging.Logger;
-import com.nxus.measurement.receivers.InstallReceiver;
-
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Build;
-import android.os.Handler;
-import android.os.RemoteException;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -93,38 +94,8 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
                 if (currentTrackingObjects != null && currentTrackingObjects.size() > 0) {
                     for (int i = 0; i < currentTrackingObjects.size(); i++) {
                         JSONObject next = currentTrackingObjects.get(i);
-                        String serverUrl = IConstants.SERVER_BASE_URL_EVENT;
 
-                        if (String.valueOf(next.get(DataKeys.TRACK_EVENT_NAME)).equalsIgnoreCase(TrackingEvents.FIRST_APP_LAUNCH)) {
-                            log.debug("Sending attribution event: " + next.get(DataKeys.TRACK_EVENT_NAME) + " : " + next.toString());
-
-                            serverUrl = IConstants.SERVER_BASE_URL_ATTRIBUTION;
-
-                            URL url = new URL(serverUrl);
-                            HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-
-                            urlConnection.setDoOutput(true);
-                            urlConnection.setUseCaches(false);
-                            urlConnection.setRequestMethod("POST");
-                            urlConnection.setRequestProperty("Content-Type", "application/json");
-                            urlConnection.setRequestProperty("charset", "utf-8");
-                            urlConnection.setRequestProperty(DataKeys.REQ_DSP_TOKEN, apiKey);
-                            urlConnection.connect();
-
-                            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(urlConnection.getOutputStream());
-                            outputStreamWriter.write(next.toString());
-                            outputStreamWriter.close();
-
-                            int httpResult = urlConnection.getResponseCode();
-                            if (httpResult == HttpURLConnection.HTTP_OK) {
-                                sendEventToS3(next, apiKey);
-                                deleteTrackingObject(next.getString(DataKeys.TRACK_EVENT_TIME_EPOCH));
-                            } else {
-                                log.error("onFailure() Response was: " + httpResult);
-                            }
-                        } else {
-                            sendEventToS3(next, apiKey);
-                        }
+                        sendEventToPostback(next, apiKey);
                     }
                 }
             } catch(Throwable e) {
@@ -145,73 +116,127 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
         }
     }
 
-    private void sendEventToS3(JSONObject eventObject, String apiKey) {
+    private void sendEventToPostback(JSONObject eventObject, String apiKey) {
+        String serverUrl = IConstants.SERVER_BASE_URL_POSTBACK;
+
         try {
+            if (String.valueOf(eventObject.get(DataKeys.TRACK_EVENT_NAME)).equalsIgnoreCase(TrackingEvents.FIRST_APP_LAUNCH)) {
+                eventObject.put(DataKeys.TRACK_EVENT_INDEX, CustomTrackingEvents.INSTALL_INDEX);
+                eventObject.put(DataKeys.TRACK_EVENT_NAME, CustomTrackingEvents.INSTALL_NAME);
+            }
+
             log.debug("Sending tracking event: " + eventObject.get(DataKeys.TRACK_EVENT_NAME) + " : " + eventObject.toString());
 
-            String requestString = buildFullDataUrl(eventObject);
-            log.debug("requestString: " + requestString);
+            StringBuilder paramsUri = new StringBuilder();
+            paramsUri.append(DataKeys.REQ_APP_KEY + "=");
+            paramsUri.append(URLEncoder.encode(apiKey, "UTF-8"));
+            paramsUri.append("&" + DataKeys.TRACK_EVENT_INDEX + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.TRACK_EVENT_INDEX), "UTF-8"));
+            paramsUri.append("&" + DataKeys.TRACK_EVENT_NAME + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.TRACK_EVENT_NAME), "UTF-8"));
+            paramsUri.append("&" + DataKeys.TRACK_EVENT_TIME + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.TRACK_EVENT_TIME), "UTF-8"));
+            paramsUri.append("&" + DataKeys.TRACK_EVENT_REVENUE_USD + "=");
+            paramsUri.append(URLEncoder.encode("", "UTF-8")); // TODO set event_revenue_usd
 
-            try {
-                URL url = new URL(requestString);
-                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setRequestProperty("User-Agent","AndroidSDK/1.0");
-                urlConnection.setRequestProperty("Accept","*/*");
-                urlConnection.setRequestProperty("Content-Type", "");
-                urlConnection.setUseCaches(false);
-                urlConnection.setRequestProperty(DataKeys.REQ_DSP_TOKEN, apiKey);
-
-                int httpResult = urlConnection.getResponseCode();
-                if (httpResult == HttpURLConnection.HTTP_OK) {
-                    deleteTrackingObject(eventObject.getString(DataKeys.TRACK_EVENT_TIME_EPOCH));
-                } else {
-                    log.error("onFailure() Response was: " + httpResult);
-                }
-            } catch (MalformedURLException e) {
-                log.error(e.getMessage(), e);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        } catch (JSONException e) {
-            log.error("Tracking error happened", e);
-        }
-    }
-
-    private String buildFullDataUrl(JSONObject job) {
-        String responseUrl = IConstants.SERVER_BASE_URL_EVENT;
-        String delimiter = "?";
-        Iterator<?> keys = job.keys();
-
-        String prefixedPackageName = "android." + context.getPackageName();
-        responseUrl += Utils.hash(prefixedPackageName,"SHA-1");
-
-        try {
-            while( keys.hasNext() ) {
-                String key = (String) keys.next();
-                if (!key.equalsIgnoreCase(DataKeys.TRACK_EVENT_TIME_EPOCH) && !key.equalsIgnoreCase(DataKeys.TRACK_ATTRIBUTION_DATA)) {
-                    responseUrl += delimiter + key + "=" + URLEncoder.encode((String)job.get(key), "UTF-8");
-                    delimiter = "&";
+            JSONObject eventParams = new JSONObject();
+            String eventParamsString = eventObject.getString(DataKeys.TRACK_EVENT_PARAM);
+            if ((eventParamsString != null) && !eventParamsString.equals("")) {
+                String[] eventParamsSplit = eventParamsString.split("&");
+                for (String param : eventParamsSplit) {
+                    String[] paramSplit = param.split("=");
+                    eventParams.put(paramSplit[0], paramSplit[1]);
                 }
             }
+            paramsUri.append("&" + DataKeys.TRACK_EVENT_PARAM + "=");
+            paramsUri.append(URLEncoder.encode(eventParams.toString(), "UTF-8"));
 
-            JSONObject joba = (JSONObject) job.get(DataKeys.TRACK_ATTRIBUTION_DATA);
-            if (joba != null) {
-                Iterator<?> akeys = joba.keys();
-                while(akeys.hasNext()) {
-                    String akey = (String) akeys.next();
-                    responseUrl += delimiter + akey + "=" + URLEncoder.encode((String)joba.get(akey), "UTF-8");
-                    delimiter = "&";
-                }
+            JSONObject attributionData = eventObject.getJSONObject(DataKeys.TRACK_ATTRIBUTION_DATA);
+            paramsUri.append("&" + DataKeys.TRACK_ATD_CLICK_ID + "=");
+            paramsUri.append(URLEncoder.encode(attributionData.getString(DataKeys.TRACK_ATD_CLICK_ID), "UTF-8"));
+            paramsUri.append("&" + DataKeys.TRACK_ATD_CAMPAIGN_ID + "=");
+            paramsUri.append(URLEncoder.encode(attributionData.getString(DataKeys.TRACK_ATD_CAMPAIGN_ID), "UTF-8"));
+            paramsUri.append("&" + DataKeys.TRACK_ATD_AFFILIATE_ID + "=");
+            paramsUri.append(URLEncoder.encode(attributionData.getString(DataKeys.TRACK_ATD_AFFILIATE_ID), "UTF-8"));
 
+            paramsUri.append("&" + DataKeys.DI_DEVICE_USER_AGENT + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_USER_AGENT), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_ABI + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_ABI), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_ACCEPT_LANGUAGE + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_LANG), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_COUNTRY + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_COUNTRY), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_FINGERPRINT_ID + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_FINGERPRINT_ID), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_HARDWARE_NAME + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_HARDWARE_NAME), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_LANG + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_LANG), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_MANUFACTURER + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_MANUFACTURER), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_MODEL + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_MODEL), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_OS + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_OS), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_OS_VERSION + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_OS_VERSION), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_SCREEN_DPI + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_SCREEN_DPI), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_SCREEN_HEIGHT + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_SCREEN_HEIGHT), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_SCREEN_WIDTH + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_SCREEN_WIDTH), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_TYPE + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_TYPE), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_APP_INSTALL_TIME + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_APP_INSTALL_TIME), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_APP_PACKAGE_NAME + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_APP_PACKAGE_NAME), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_APP_PACKAGE_VERSION + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_APP_PACKAGE_VERSION), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_NETWORK_CONNECTION_TYPE + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_NETWORK_CONNECTION_TYPE), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_AAID + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_AAID), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_USER_IP + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_NETWORK_IP), "UTF-8"));
+
+            URL url = new URL(serverUrl);
+            HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+
+            urlConnection.setDoOutput(true);
+            urlConnection.setUseCaches(false);
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setRequestProperty("charset", "utf-8");
+            urlConnection.connect();
+
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(urlConnection.getOutputStream());
+            outputStreamWriter.write(paramsUri.toString());
+            outputStreamWriter.flush();
+
+            int httpResult = urlConnection.getResponseCode();
+
+            log.debug("Sending Event To Postback: " + serverUrl);
+            log.debug("POST params: " + paramsUri.toString());
+            log.debug("Response code: " + httpResult);
+
+            if (httpResult == HttpURLConnection.HTTP_OK) {
+                deleteTrackingObject(eventObject.getString(DataKeys.TRACK_EVENT_TIME_EPOCH));
+            } else {
+                log.error("onFailure() Response was: " + httpResult);
             }
+
+        } catch (MalformedURLException e) {
+            log.error(e.getMessage(), e);
+        } catch (ProtocolException e) {
+            log.error(e.getMessage(), e);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
         } catch (JSONException e) {
             log.error(e.getMessage(), e);
-        } catch (UnsupportedEncodingException e) {
-            log.error(e.getMessage(), e);
         }
-
-        return responseUrl;
     }
 
     /**

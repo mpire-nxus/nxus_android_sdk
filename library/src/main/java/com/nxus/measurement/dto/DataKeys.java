@@ -64,6 +64,8 @@ public class DataKeys {
 	public static final String DI_APP_FIRST_LAUNCH			= "app_first_launch";
 	public static final String DI_SDK_VERSION				= "sdk_version";
 	public static final String DI_SDK_PLATFORM				= "sdk_platform";
+	public static final String DI_ACCEPT_LANGUAGE			= "device_accept_language";
+	public static final String DI_USER_IP					= "user_ip";
 
 	// Tracking keys
 	public static final String TRACK_EVENT_INDEX			= "event_index";
@@ -71,6 +73,7 @@ public class DataKeys {
 	public static final String TRACK_EVENT_PARAM			= "event_param";
 	public static final String TRACK_EVENT_TIME				= "event_time";
 	public static final String TRACK_EVENT_TIME_EPOCH		= "event_time_epoch";
+	public static final String TRACK_EVENT_REVENUE_USD		= "event_revenue_usd";
 	public static final String TRACK_ATD_CLICK_ID			= "click_id";
 	public static final String TRACK_ATD_AFFILIATE_ID		= "affiliate_id";
 	public static final String TRACK_ATD_CAMPAIGN_ID		= "campaign_id";
@@ -78,5 +81,8 @@ public class DataKeys {
 
 	// Request header keys
 	public static final String REQ_DSP_TOKEN				= "dsp-token";
+
+	public static final String REQ_APP_KEY					= "app_key";
+
 
 }

@@ -4,8 +4,8 @@ package com.nxus.measurement.dto;
  * @author TechMpire Ltd.
  */
 public interface IConstants {
-    String SERVER_BASE_URL_EVENT = "https://sdk.mpire.eventnx.us/";
-    String SERVER_BASE_URL_ATTRIBUTION = "https://sdk-attribution.mpire.nxus.mobi/";
+
+    String SERVER_BASE_URL_POSTBACK = "https://mpire.postnx.us/";
 
     String SDK_PLATFORM = "android_native";
 
