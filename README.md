@@ -20,7 +20,7 @@ allprojects {
 Open your <b>app</b> module's <b>build.gradle</b> file and add the following dependencies:
 ```
 compile 'com.google.android.gms:play-services-base:9.2.0'
-compile ('com.nxus.measurement:library:1.1.0@aar') {
+compile ('com.nxus.measurement:library:1.1.2@aar') {
 	transitive = true
 }
 ```

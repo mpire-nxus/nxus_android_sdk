@@ -202,14 +202,18 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
             paramsUri.append("&" + DataKeys.DI_USER_IP + "=");
             paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_NETWORK_IP), "UTF-8"));
 
+            byte[] postData = paramsUri.toString().getBytes();
+            int postDataLength = postData.length;
+
             URL url = new URL(serverUrl);
             HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
 
             urlConnection.setDoOutput(true);
             urlConnection.setUseCaches(false);
             urlConnection.setRequestMethod("POST");
-            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             urlConnection.setRequestProperty("charset", "utf-8");
+            urlConnection.setRequestProperty("Content-Length", Integer.toString(postDataLength));
             urlConnection.connect();
 
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(urlConnection.getOutputStream());
