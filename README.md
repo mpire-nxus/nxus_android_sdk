@@ -36,7 +36,7 @@ Also, inside the <b>application</b> tag, add following <b>meta-data</b> tag:
 ```
 <meta-data 
 	android:name="nxus.measurement.token"
-	android:value="[YOUR_NXUS_DSP_TOKEN]">
+	android:value="[YOUR_API_KEY]">
 </meta-data>
 ```
 
