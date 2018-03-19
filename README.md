@@ -1,5 +1,5 @@
 ## Summary
-TechMpire nxus platform SDK for Android platform
+TechMpire Measurement SDK for Android platform
 
 ## Integration into project
 To integrate the SDK, add you have to add our Maven repository to your <b>app's build.gradle file</b>:
