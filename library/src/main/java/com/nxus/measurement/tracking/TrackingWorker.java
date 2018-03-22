@@ -202,6 +202,31 @@ public class TrackingWorker implements Runnable, GoogleAdvertisingTaskPlayReferr
             paramsUri.append("&" + DataKeys.DI_USER_IP + "=");
             paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_NETWORK_IP), "UTF-8"));
 
+            paramsUri.append("&" + DataKeys.DI_DEVICE_API_LEVEL + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_API_LEVEL), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_SCREEN_FORMAT + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_SCREEN_FORMAT), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_DEVICE_SCREEN_SIZE + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_DEVICE_SCREEN_SIZE), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_SDK_PLATFORM + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_SDK_PLATFORM), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_SDK_VERSION + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_SDK_VERSION), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_APP_PACKAGE_VERSION_CODE + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_APP_PACKAGE_VERSION_CODE), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_APP_FIRST_LAUNCH + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_APP_FIRST_LAUNCH), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_TRUST_DEVICE_ID + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_TRUST_DEVICE_ID), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_APP_USER_UUID + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_APP_USER_UUID), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_PLAY_REF_CLICK_TIMESTAMP + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_PLAY_REF_CLICK_TIMESTAMP), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_PLAY_INSTALL_BEGIN_TIME + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_PLAY_INSTALL_BEGIN_TIME), "UTF-8"));
+            paramsUri.append("&" + DataKeys.DI_PLAY_REFERRER + "=");
+            paramsUri.append(URLEncoder.encode(eventObject.getString(DataKeys.DI_PLAY_REFERRER), "UTF-8"));
+
             byte[] postData = paramsUri.toString().getBytes();
             int postDataLength = postData.length;
 
